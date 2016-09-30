@@ -112,7 +112,7 @@ public class Ecosistema extends PApplet{
 		for(Creature c: creatures){
 			rectMode(CENTER);
 			if (mouseX >= c.getX() - c.getSize() && mouseX <= c.getX() + c.getSize()  && mouseY >= c.getY() - c.getSize() && mouseY <= c.getY() + c.getSize() ){
-				background(100);
+				background(150);
 				System.out.println("______________");				
 				System.out.println("NAME:" + c.getName());
 				System.out.println("GENDER:" + c.getGender());
