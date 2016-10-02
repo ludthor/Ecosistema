@@ -12,7 +12,7 @@ public class Ecosistema extends PApplet{
 	private final boolean toroidal = true;
 	Creature[] creatures;
 	Territory t;
-//	Carnivore car;
+
 	
     public void settings(){
         size(800,500);
@@ -29,8 +29,8 @@ public class Ecosistema extends PApplet{
     	for(int i = 0; i < NUM_CREATURES; i++){
     		creatures[i] = EcoUtilities.generateCreature(this, toroidal, 0.3f, 0.3f);
     	}
-//        car = new Carnivore(this, true);
-//        car.setSize(20);
+
+    	this.t = new Territory( width , height , 3 , 3);
     }
 
     public void draw(){
@@ -95,7 +95,7 @@ public class Ecosistema extends PApplet{
 	}
 
 	private void checkTerritory() {
-	    this.t = new Territory( width , height , 3 , 3);
+	    
 	    for(int i=0 ; i< NUM_CREATURES;i++){ //se recorre cada animal y :
 
 	        t.locate( this.creatures[i].getX() , this.creatures[i].getY() , i );
@@ -120,6 +120,7 @@ public class Ecosistema extends PApplet{
 				System.out.println("______________");
 			}
 		}
+		this.t.printProperties(mouseX, mouseY);
 		
 	}
 	
