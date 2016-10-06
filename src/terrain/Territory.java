@@ -1,5 +1,7 @@
 package terrain;
 
+import java.util.Arrays;
+
 public class Territory {
 
     private float width;
@@ -11,6 +13,7 @@ public class Territory {
 
     public Territory( float screenW , float screenH, int row, int col){
     	//inicializa el objeto definiendo la matriz de celdas
+    	String [] propertyNames={"test1","test2","test3"};
 
     	this.width = screenW;
     	this.height = screenH;
@@ -23,12 +26,19 @@ public class Territory {
 
             for(int j=0;j<row;j++){
 
-                places[i][j] = new T_Place(i,j);
+                places[i][j] = new T_Place(i,j, new RandomNumericProperties(Arrays.asList(propertyNames)));
 
             }
 
         }
 
+    }
+    
+    public void printProperties(double mouseX,double mouseY){
+    	
+    	int modH = (int) (mouseX /(this.width/row));
+    	int modV = (int) (mouseY/(this.height/col));
+    	this.places[modH][modV].printProperties();
     }
     public void locate( float x , float y , int id ){
     //este comportamiento ubica a cada objeto en su celda

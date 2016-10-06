@@ -1,5 +1,7 @@
 package terrain;
 
+import interfaces.PlacePropertiesManagerI;
+
 public 
 class T_Place{
 
@@ -8,8 +10,10 @@ class T_Place{
     int row,col;
     float x[], y[];
     int id[];
+    PlaceProperties placeProperties;
+    PlacePropertiesManagerI placePropertiesManager;
 
-    T_Place( int col_ , int fila_ ){
+    T_Place( int col_ , int fila_,PlacePropertiesManagerI placePropertiesManager ){
 
         row = fila_;
         col = col_;
@@ -18,6 +22,8 @@ class T_Place{
         x = new float[limit];
         y = new float[limit];
         id = new int[limit];
+        placeProperties = placePropertiesManager.startProperties();
+        
 
     }
 
@@ -88,6 +94,15 @@ class T_Place{
 
 	public void setId(int[] id) {
 		this.id = id;
+	}
+	
+	public void printProperties(){
+		System.out.println("----------------- "+row+" "+col);
+		for(String s :placeProperties.getPropertyNames()){
+			System.out.println(s+" "+placeProperties.getDoubleProperty(s));
+		}
+		System.out.println("-----------------");
+		
 	}
 
 }  
