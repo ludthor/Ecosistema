@@ -1,6 +1,7 @@
 package UI;
 
 import creatures.Creature;
+import creatures.Creature2;
 import processing.core.PApplet;
 import terrain.T_Place;
 import terrain.Territory;
@@ -10,7 +11,8 @@ public class Ecosistema extends PApplet{
 	
 	private final int NUM_CREATURES = 50;
 	private final boolean toroidal = true;
-	Creature[] creatures;
+	//Creature[] creatures;
+	Creature2[] creatures2;
 	Territory t;
 
 	
@@ -23,11 +25,13 @@ public class Ecosistema extends PApplet{
     public void setup(){
     	frameRate(30);
         background(0);
-    	creatures = new Creature[NUM_CREATURES];
+    	//creatures = new Creature[NUM_CREATURES];
+    	creatures2 = new Creature2[NUM_CREATURES];
     	
     	//Inicialize creatures one by one.
     	for(int i = 0; i < NUM_CREATURES; i++){
-    		creatures[i] = EcoUtilities.generateCreature(this, toroidal, 0.3f, 0.3f);
+    		//creatures[i] = EcoUtilities.generateCreature(this, toroidal, 0.3f, 0.3f);
+    		creatures2[i] = new Creature2(this, toroidal);
     	}
 
     	this.t = new Territory( width , height , 3 , 3);
@@ -45,11 +49,11 @@ public class Ecosistema extends PApplet{
     }
     
 	private void moveCreatures() {
-	       for(Creature c: creatures){
+	       for(Creature2 c: creatures2){
 	    	   if(c.isAlive()){
 	    		   //System.out.println(c.getEnergy());
-	    		   c.move();
-	    		   c.draw();
+	    		   c.getActionManager().move();
+	    		   c.getActionManager().draw();
 	    	   }
 	       }
 	}
@@ -77,11 +81,11 @@ public class Ecosistema extends PApplet{
 	                    int id2 = thisPlace.getId()[l];
 	                    // recupera el id
 
-	                    creatures[id1].solveEncounter( creatures[id2] );
+	                    creatures2[id1].getActionManager().solveEncounter( creatures2[id2] );
 	                    // enfrenta al organismo
 	                    // 1 con el 2
 
-	                    creatures[id2].solveEncounter( creatures[id1] );
+	                    creatures2[id2].getActionManager().solveEncounter( creatures2[id1] );
 	                    // enfrenta al organismo
 	                    // 2 con el 1
 
@@ -98,7 +102,7 @@ public class Ecosistema extends PApplet{
 	    
 	    for(int i=0 ; i< NUM_CREATURES;i++){ //se recorre cada animal y :
 
-	        t.locate( this.creatures[i].getX() , this.creatures[i].getY() , i );
+	        t.locate( this.creatures2[i].getX() , this.creatures2[i].getY() , i );
 
 	    }		
 	}
@@ -109,14 +113,17 @@ public class Ecosistema extends PApplet{
 	
 	public void mouseClicked(){
 		
-		for(Creature c: creatures){
+		for(Creature2 c: creatures2){
 			rectMode(CENTER);
 			if (mouseX >= c.getX() - c.getSize() && mouseX <= c.getX() + c.getSize()  && mouseY >= c.getY() - c.getSize() && mouseY <= c.getY() + c.getSize() ){
 				background(150);
 				System.out.println("______________");				
-				System.out.println("NAME:" + c.getName());
+				//System.out.println("NAME:" + c.getName());
+				Object[] args = {c};
+				Class[] aArgs={Creature2.class};
+				c.getActionManager().doAction("printNameCreature",aArgs, args);
 				System.out.println("GENDER:" + c.getGender());
-				System.out.println(c.getClass());
+				//System.out.println(c.getClass());
 				System.out.println("______________");
 			}
 		}
