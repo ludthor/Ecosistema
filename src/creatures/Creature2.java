@@ -188,11 +188,11 @@ public class Creature2{
 		this.actionManager = actionManager;
 	}
 
-	public ActionChooserI getActionChooserI() {
+	public ActionChooserI getActionChooser() {
 		return actionChooser;
 	}
 
-	public void setActionChooserI(ActionChooserI actionChooserI) {
+	public void setActionChooser(ActionChooserI actionChooserI) {
 		this.actionChooser = actionChooserI;
 	}
 	

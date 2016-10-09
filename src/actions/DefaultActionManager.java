@@ -3,6 +3,7 @@ package actions;
 import java.lang.reflect.InvocationTargetException;
 
 import creatures.Creature2;
+import enums.Behavior;
 import interfaces.ActionManagerI;
 import processing.core.PApplet;
 
@@ -70,8 +71,25 @@ public class DefaultActionManager implements ActionManagerI{
 
 	@Override
 	public void solveEncounter(Creature2 other) {
-		if(processing.dist(self.getX(), self.getY(), other.getX(), other.getY()) < self.getSize()*4)
-			self.setDirection(processing.atan2(self.getY() - other.getY(), self.getX() - other.getX()));		
+		Behavior behavior = self.getActionChooser().selectAction(self, other);
+		
+		switch (behavior) {
+		case CHASE:
+			doAction("perseguirAlOtro", new Class[]{Creature2.class}, new Object[]{other});
+			//perseguirAlOtro(other);
+			break;
+		case RUN_AWAY:
+			doAction("huirDelOtro", new Class[]{Creature2.class}, new Object[]{other});
+			//huirDelOtro(other);
+			break;
+
+		default:
+			if(processing.dist(self.getX(), self.getY(), other.getX(), other.getY()) < self.getSize()*4)
+				self.setDirection(processing.atan2(self.getY() - other.getY(), self.getX() - other.getX()));
+			break;
+		}
+		
+				
 		
 	}
 	
@@ -92,6 +110,16 @@ public class DefaultActionManager implements ActionManagerI{
         self.setDirection(self.getDirection() + processing.random( -rad , rad )); 
 
     }
+	
+	public void huirDelOtro( Creature2 other ){
+	    self.setDirection(processing.atan2( self.getY()-other.getY() , self.getX()-other.getX() ));    
+	    move();
+	}
+	
+	public void perseguirAlOtro( Creature2 other  ){
+	    self.setDirection(processing.atan2( other.getY()-self.getY() , other.getX()-self.getX() ));    
+	    move();
+	  }
 
 
 }
