@@ -5,6 +5,7 @@ import java.awt.Color;
 import actions.DefaultActionChooser;
 import actions.DefaultActionManager;
 import enums.Gender;
+import enums.Species;
 import interfaces.ActionChooserI;
 import interfaces.ActionManagerI;
 import processing.core.PApplet;
@@ -18,7 +19,7 @@ public class Creature2{
 	protected float speed;
 	protected Gender gender;
 	protected Color color;
-	
+	protected Species species;
 	//position
 	protected float x;
 	protected float y;
@@ -28,6 +29,7 @@ public class Creature2{
 	protected float dirVariation;
 	protected int size;
 	protected boolean toroidal;
+	protected boolean isAlive;
 	
 	protected PApplet processing;
 	private ActionManagerI actionManager;
@@ -41,6 +43,8 @@ public class Creature2{
 		this.energy = 100000;
 		this.speed = processing.random(5);
 		this.gender = EcoUtilities.binaryGender(0.5f);
+		isAlive=true;
+		this.species=Species.PLANT;
 		
 		//Coloring the creature
 		float r = processing.random(255);
@@ -58,6 +62,7 @@ public class Creature2{
 		actionManager.init(processing, this);
 		actionChooser= new DefaultActionChooser();
 		actionChooser.init(processing);
+		
 	}
 	
 	private void initPos(){
@@ -70,9 +75,10 @@ public class Creature2{
 	
 	
 	public boolean isAlive(){
-		if (this.getHealth() > 0 && getEnergy() > 0)
+		/*if (this.getHealth() > 0 && getEnergy() > 0)
 			return true;
-		return false;
+		return false;*/
+		return isAlive;
 	}
 	
 	//Getters & Setters
@@ -195,6 +201,25 @@ public class Creature2{
 	public void setActionChooser(ActionChooserI actionChooserI) {
 		this.actionChooser = actionChooserI;
 	}
+
+	public Species getSpecies() {
+		return species;
+	}
+
+	public void setSpecies(Species species) {
+		this.species = species;
+	}
+
+	public void setAlive(boolean isAlive) {
+		this.isAlive = isAlive;
+	}
+	
+	public void die(){
+		this.isAlive=false;
+	}
+	
+	
+	
 	
 	
 

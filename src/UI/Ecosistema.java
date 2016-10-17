@@ -30,8 +30,8 @@ public class Ecosistema extends PApplet{
     	
     	//Inicialize creatures one by one.
     	for(int i = 0; i < NUM_CREATURES; i++){
-    		//creatures[i] = EcoUtilities.generateCreature(this, toroidal, 0.3f, 0.3f);
-    		creatures2[i] = new Creature2(this, toroidal);
+    		creatures2[i] = EcoUtilities.generateCreature2(this, toroidal, 0.3f, 0.3f);
+    		//creatures2[i] = new Creature2(this, toroidal);
     	}
 
     	this.t = new Territory( width , height , 3 , 3);
@@ -41,7 +41,6 @@ public class Ecosistema extends PApplet{
     	
     	background(0);
     	mouseAreaDraw();
-    	
     	checkTerritory();
     	solveEncounters();
     	moveCreatures();
@@ -74,23 +73,20 @@ public class Ecosistema extends PApplet{
 
 	                int id1 = thisPlace.getId()[k];
 	                // recupera el id
-
-	                for( int l=k+1 ;l < thisPlace.getTotal() && l<limit ; l++ ){
-	                // toma otro objeto del lugar
-
-	                    int id2 = thisPlace.getId()[l];
-	                    // recupera el id
-
-	                    creatures2[id1].getActionManager().solveEncounter( creatures2[id2] );
-	                    // enfrenta al organismo
-	                    // 1 con el 2
-
-	                    creatures2[id2].getActionManager().solveEncounter( creatures2[id1] );
-	                    // enfrenta al organismo
-	                    // 2 con el 1
-
-	                }
-
+	                if(creatures2[id1].isAlive())
+		                for( int l=k+1 ;l < thisPlace.getTotal() && l<limit ; l++ ){
+		                // toma otro objeto del lugar
+		                    int id2 = thisPlace.getId()[l];
+		                    // recupera el id
+		                    if(creatures2[id2].isAlive()){
+			                    creatures2[id1].getActionManager().solveEncounter( creatures2[id2] );
+			                    // enfrenta al organismo
+			                    // 1 con el 2
+			                    creatures2[id2].getActionManager().solveEncounter( creatures2[id1] );
+			                    // enfrenta al organismo
+			                    // 2 con el 1
+		                    }
+		                }
 	            }
 
 	        }

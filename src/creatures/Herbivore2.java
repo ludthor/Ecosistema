@@ -5,12 +5,13 @@ import java.awt.Color;
 import actions.CarnivoreActionManager;
 import actions.DefaultActionChooser;
 import actions.DefaultActionManager;
+import actions.HerbivoreActionManager;
 import enums.Species;
 import interfaces.ActionChooserI;
 import interfaces.ActionManagerI;
 import processing.core.PApplet;
 
-public class Carnivore2 extends Creature2  {
+public class Herbivore2 extends Creature2  {
 	
 	private PApplet processing;
 	private ActionManagerI actionManager;
@@ -18,18 +19,18 @@ public class Carnivore2 extends Creature2  {
 	
 	
 
-	public Carnivore2(PApplet p, boolean toroidal) {
+	public Herbivore2(PApplet p, boolean toroidal) {
 		super(p, toroidal);
 		
 		this.processing = p;
-		this.color = new Color(processing.color(processing.random(100,255),0,0));
-		this.dirVariation = 15.0f;
+		this.color = new Color(processing.color(0,0,processing.random(100,255)));
+		this.dirVariation = 30.0f;
 		this.setSize(20);
 		this.actionChooser= new DefaultActionChooser();
-		this.actionManager = new CarnivoreActionManager();
-		this.species= Species.CARNIVORE;
+		this.actionManager = new HerbivoreActionManager();
 		actionManager.init(processing, this);
 		actionChooser.init(processing);
+		this.species= Species.HERBIVORE;
 	}
 	
 	public ActionManagerI getActionManager() {

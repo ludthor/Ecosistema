@@ -3,9 +3,13 @@ package util;
 import java.util.Random;
 
 import creatures.Carnivore;
+import creatures.Carnivore2;
 import creatures.Creature;
+import creatures.Creature2;
 import creatures.Herbivore;
+import creatures.Herbivore2;
 import creatures.Plant;
+import creatures.Plant2;
 import enums.Gender;
 import processing.core.PApplet;
 
@@ -54,6 +58,22 @@ public class EcoUtilities {
 			return new Herbivore(p, toroidal);
 		}else{
 			return new Plant(p, toroidal);
+		}
+	}
+	
+	public static Creature2 generateCreature2(PApplet p, boolean toroidal,float probC, float probH){
+		if(probC + probH > 1){
+			return new Plant2(p, toroidal);
+		}
+		
+		float random = (float) Math.random();
+		
+		if(random <= probC){
+			return new Carnivore2(p, toroidal);
+		}else if (random > probC && random <= (probC + probH) ){
+			return new Herbivore2(p, toroidal);
+		}else{
+			return new Plant2(p, toroidal);
 		}
 	}
 	

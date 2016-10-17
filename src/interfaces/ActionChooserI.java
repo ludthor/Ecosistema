@@ -8,6 +8,8 @@ public interface ActionChooserI {
 	
 	public void init(PApplet p);
 	
+	public void loadBehavior();
+	
 	public Behavior selectAction(Creature2 c);
 	
 	public Behavior selectAction(Creature2 c,Creature2 other);
