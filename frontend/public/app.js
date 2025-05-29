@@ -1,212 +1,157 @@
-const canvas = document.getElementById('simulationCanvas');
-const ctx = canvas.getContext('2d');
+// Old canvas and context setup - no longer needed with P5.js
+// const canvas = document.getElementById('simulationCanvas'); 
+// const ctx = canvas.getContext('2d'); 
 
-// Set canvas dimensions (should match backend simulation dimensions if possible)
-// canvas.width = 600;  // Old value
-// canvas.height = 600; // Old value
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// Old canvas dimension setting - P5.js handles this via createCanvas
+// canvas.width = window.innerWidth; 
+// canvas.height = window.innerHeight; 
 
-const backendUrl = 'http://localhost:8080/api/simulation/state'; // Assuming Spring Boot runs on 8080
-let creaturesCache = []; // Cache for storing fetched creatures
+const backendUrl = 'http://localhost:8080/api/simulation/state';
+let creaturesCache = []; 
 
-async function fetchCreatures() {
+// --- P5.js Structure ---
+
+function setup() {
+    createCanvas(windowWidth, windowHeight); // Use P5.js windowWidth and windowHeight
+    console.log("P5.js setup complete. Canvas created at window dimensions:", windowWidth, "x", windowHeight);
+    
+    // Initial fetch of creatures
+    fetchCreatures().then(data => {
+        if (data) {
+            creaturesCache = data;
+            console.log('Initial creatures fetched in setup:', creaturesCache.length);
+        }
+    }).catch(error => {
+        console.error("Error during initial fetch in setup:", error);
+    });
+
+    // Periodic refresh of creature data
+    setInterval(async () => {
+        try {
+            const data = await fetchCreatures();
+            if (data) {
+                creaturesCache = data;
+                // console.log('Creatures cache updated:', creaturesCache.length); // Can be noisy
+            }
+        } catch (error) {
+            console.error("Error during periodic fetch:", error);
+        }
+    }, 500); // Refresh every 500ms
+    
+    console.log('P5.js: setup() finished.');
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    console.log("P5.js canvas resized to:", windowWidth, windowHeight);
+    // Optional: Redraw static elements or re-center view if needed after resize
+    // The main draw() loop will continue to render content.
+}
+
+function draw() {
+    background(220); // Clear background with light gray
+
+    if (creaturesCache.length > 0) {
+        for (let creature of creaturesCache) {
+            drawP5Creature(creature); 
+        }
+    }
+    
+    // console.log('P5.js draw() loop running'); // Can be very noisy
+}
+
+// --- End P5.js Structure ---
+
+function drawP5Creature(creature) {
+    if (!creature || typeof creature.x !== 'number' || typeof creature.y !== 'number' || typeof creature.size !== 'number') {
+        // console.warn("Invalid creature data for P5 drawing:", creature);
+        return;
+    }
+
+    let creatureColorValue; 
+    let shapeType = 'rect'; 
+    let p5DrawSize = creature.size;
+
+    switch (creature.type) {
+        case 'Plant':
+            creatureColorValue = color(0, 128, 0); 
+            shapeType = 'rect';
+            break;
+        case 'Herbivore':
+            creatureColorValue = color(0, 0, 255); 
+            shapeType = 'circle';
+            break;
+        case 'Carnivore':
+            creatureColorValue = color(255, 0, 0); 
+            shapeType = 'circle';
+            break;
+        default:
+            if (creature.color && typeof creature.color === 'string' && creature.color.startsWith('#')) {
+                try {
+                    creatureColorValue = color(creature.color); 
+                } catch (e) {
+                    creatureColorValue = color(128); 
+                }
+            } else {
+                creatureColorValue = color(128); 
+            }
+            break;
+    }
+
+    fill(creatureColorValue);
+    noStroke(); 
+
+    if (shapeType === 'rect') {
+        rectMode(CENTER);
+        rect(creature.x, creature.y, p5DrawSize, p5DrawSize);
+    } else if (shapeType === 'circle') {
+        ellipseMode(CENTER);
+        ellipse(creature.x, creature.y, p5DrawSize, p5DrawSize); 
+    }
+    
+    // console.log(`P5 Draw: type=${creature.type}, shape=${shapeType}, color=${creatureColorValue.toString()}, x=${creature.x}, y=${creature.y}, size=${p5DrawSize}`);
+}
+
+async function fetchCreatures() { 
     try {
         const response = await fetch(backendUrl);
-        console.log('API Response Status:', response.status); // Added log
+        // The console logs for API status and parsed JSON were here. 
+        // They can be re-added if specific debugging of fetch is needed again.
+        // console.log('API Response Status:', response.status); 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log('Fetched creatures data (parsed JSON):', data); // Added log
+        // console.log('Fetched creatures data (parsed JSON):', data); 
         return data;
     } catch (error) {
         console.error("Could not fetch creatures:", error);
-        return []; // Return empty array on error
+        return []; 
     }
 }
 
-function drawCreature(creature) {
-    console.log('Drawing creature:', creature); // Original first log, restored
+// Note: The old gameLoop, old drawCreature (using ctx), the old click listener, 
+// and the old download button logic have been removed as they are obsolete with P5.js.
+// P5.js handles the draw loop automatically. Event handling (clicks, downloads) 
+// will be re-implemented using P5.js specific functions if needed.
+// The console logs specific to those old functions are also implicitly removed.
+// The logs for 'Creatures received in gameLoop' and the more detailed 'Drawing creature' logs
+// from the old structure are also naturally gone with the removal of gameLoop and old drawCreature.
+// The new P5 structure has its own logs in setup, draw, drawP5Creature, and fetchCreatures.
 
-    if (!creature || typeof creature.x !== 'number' || typeof creature.y !== 'number' || typeof creature.size !== 'number' ) {
-        console.error("Invalid creature data for drawing (missing x, y, or size):", creature);
-        return; 
-    }
-
-    let creatureColor = creature.color; // Default to its given color from backend (which is random hex)
-    // let shape = 'rect'; // Shape logic still commented out for this step
-    // let drawSize = creature.size; // Size logic still commented out for this step
-
-    // Determine color and shape based on type, overriding the random hex color for specific types
-    switch (creature.type) {
-        case 'Plant':
-            creatureColor = 'green';
-            // shape = 'rect'; // Keep commented
-            break;
-        case 'Herbivore':
-            creatureColor = 'blue';
-            // shape = 'circle'; // Keep commented
-            break;
-        case 'Carnivore':
-            creatureColor = 'red';
-            // shape = 'circle'; // Keep commented
-            break;
-        default:
-            // For base "Creature" type if any, or unknown types
-            // Keep the creature.color if type is unknown, or default to grey
-            creatureColor = creature.color || 'grey'; 
-            break;
-    }
-
-    ctx.fillStyle = creatureColor;
-    
-    let drawSize = creature.size; // Dynamic sizing is already restored
-
-    // ---- Restore Shape Logic ----
-    let shape = 'rect'; // Default shape
-    switch (creature.type) {
-        case 'Plant':
-            // creatureColor = 'green'; // Already handled by prior switch
-            shape = 'rect'; 
-            break;
-        case 'Herbivore':
-            // creatureColor = 'blue'; // Already handled by prior switch
-            shape = 'circle'; 
-            break;
-        case 'Carnivore':
-            // creatureColor = 'red'; // Already handled by prior switch
-            shape = 'circle'; 
-            break;
-        // default for color is handled, shape defaults to rect
-    }
-    // ---- End Restore Shape Logic ----
-
-    // Restore the detailed log to its full original form (or the one from Step 2 of this plan)
-    console.log(`Restored Shapes - Attempting draw: type=${creature.type}, shape=${shape}, color=${ctx.fillStyle}, x=${creature.x}, y=${creature.y}, size=${drawSize}`);
-
-    // ---- Restore Conditional Drawing ----
-    if (shape === 'rect') {
-        ctx.fillRect(creature.x - drawSize / 2, creature.y - drawSize / 2, drawSize, drawSize);
-    } else if (shape === 'circle') {
-        ctx.beginPath();
-        ctx.arc(creature.x, creature.y, drawSize / 2, 0, Math.PI * 2);
-        ctx.fill();
-    }
-    // ---- End Restore Conditional Drawing ----
-
-    // Optional: Draw health bar or energy level (can be added later)
-    // Example:
-    // if (creature.type !== 'Plant') { // Don't draw for plants for now
-    //     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-    //     ctx.fillRect(creature.x - drawSize / 2, creature.y - drawSize / 2 - 7, drawSize, 5);
-    //     ctx.fillStyle = 'lightgreen'; // Or 'orange' for energy
-    //     ctx.fillRect(creature.x - drawSize / 2, creature.y - drawSize / 2 - 7, drawSize * (creature.health / 100), 5);
-    // }
-}
-
-async function gameLoop() {
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // --- Start Fixed Background Art for Debugging ---
-    ctx.fillStyle = 'lightgray';
-    ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill background with light gray
-
-    ctx.fillStyle = 'red';
-    ctx.fillRect(10, 10, 50, 50); // Draw a red square at top-left
-
-    ctx.fillStyle = 'blue';
-    ctx.beginPath();
-    ctx.arc(canvas.width - 60, 60, 50, 0, Math.PI * 2); // Draw a blue circle at top-right
-    ctx.fill();
-
-    ctx.strokeStyle = 'green';
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height / 2);
-    ctx.lineTo(canvas.width, canvas.height / 2); // Draw a green horizontal line in the middle
-    ctx.stroke();
-    
-    console.log('Attempted to draw fixed background art.');
-    // --- End Fixed Background Art for Debugging ---
-
-    const fetchedCreatures = await fetchCreatures(); // Renamed to avoid conflict with global 'creatures' if any
-    console.log('Creatures received in gameLoop:', fetchedCreatures); // Added log
-    creaturesCache = fetchedCreatures; // Update cache
-    
-    creaturesCache.forEach(creature => {
-        if (creature && typeof creature.x === 'number' && typeof creature.y === 'number' && typeof creature.size === 'number') {
-            drawCreature(creature);
-        } else {
-            console.warn("Invalid creature data for drawing:", creature);
-        }
-    });
-
-    requestAnimationFrame(gameLoop); // Loop
-}
-
-// Click handler
-canvas.addEventListener('click', function(event) {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    const clickedCreature = creaturesCache.find(c => {
-        if (!c || typeof c.x !== 'number' || typeof c.y !== 'number' || typeof c.size !== 'number') {
-            return false;
-        }
-        const size = c.size;
-        // Check bounds based on shape
-        if (c.type === 'Plant' || (c.type !== 'Herbivore' && c.type !== 'Carnivore')) { // Assuming Plant and default are rects
-            return mouseX >= c.x - size / 2 && mouseX <= c.x + size / 2 &&
-                   mouseY >= c.y - size / 2 && mouseY <= c.y + size / 2;
-        } else { // Herbivore and Carnivore are circles
-            const distance = Math.sqrt(Math.pow(mouseX - c.x, 2) + Math.pow(mouseY - c.y, 2));
-            return distance <= size / 2;
-        }
-    });
-
-    if (clickedCreature) {
-        console.log("Creature clicked:", {
-            id: clickedCreature.id,
-            name: clickedCreature.name,
-            gender: clickedCreature.gender,
-            type: clickedCreature.type,
-            energy: clickedCreature.energy,
-            health: clickedCreature.health,
-            x: clickedCreature.x,
-            y: clickedCreature.y,
-            size: clickedCreature.size,
-            color: clickedCreature.color // Log original color for debugging
+document.addEventListener('DOMContentLoaded', () => {
+    const downloadButton = document.getElementById('downloadCanvasBtn');
+    if (downloadButton) {
+        downloadButton.addEventListener('click', () => {
+            // Ensure P5 canvas exists and saveCanvas function is available
+            if (typeof saveCanvas === 'function') { 
+                saveCanvas('ecosystem_snapshot', 'png'); // P5.js global function
+                console.log('P5.js: Canvas download initiated via saveCanvas().');
+            } else {
+                console.error('P5.js saveCanvas function not found. Is P5.js loaded correctly and script order correct?');
+            }
         });
-        // Display this info on the page instead of console.log in a future task
-        // For example, update a div: document.getElementById('creatureInfo').textContent = JSON.stringify(clickedCreature, null, 2);
+    } else {
+        console.warn('Download button #downloadCanvasBtn not found.');
     }
 });
-
-// Start the simulation loop
-gameLoop();
-
-const downloadButton = document.getElementById('downloadCanvasBtn');
-
-if (downloadButton) {
-    downloadButton.addEventListener('click', function() {
-        // Get the data URL of the canvas
-        const dataURL = canvas.toDataURL('image/png');
-
-        // Create a temporary link element
-        const link = document.createElement('a');
-        link.href = dataURL;
-        link.download = 'ecosystem_snapshot.png'; // Filename for the download
-
-        // Programmatically click the link to trigger the download
-        document.body.appendChild(link); // Required for Firefox
-        link.click();
-        document.body.removeChild(link); // Clean up
-        
-        console.log('Canvas download initiated.');
-    });
-} else {
-    console.warn('Download button not found.');
-}
