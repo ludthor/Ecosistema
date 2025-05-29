@@ -24,6 +24,10 @@ public class Creature {
     private boolean toroidal; // World wraps around?
     private String color;
 
+    // Effective world dimensions for this creature's movement and positioning
+    private float creatureEffectiveWorldWidth;
+    private float creatureEffectiveWorldHeight;
+
     // New attributes from the description
     private int age;
     private int maxAge; // Example: 1000 simulation steps
@@ -35,11 +39,13 @@ public class Creature {
     private static Random random = new Random();
 
     // Constructor for creating creatures with specific initial parameters
-    public Creature(String name, float x, float y, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy) {
+    public Creature(String name, float x, float y, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy, float effectiveWorldWidth, float effectiveWorldHeight) {
         this.id = idCounter.incrementAndGet();
         this.name = name;
         this.x = x;
         this.y = y;
+        this.creatureEffectiveWorldWidth = effectiveWorldWidth; // Initialize effective world dimensions
+        this.creatureEffectiveWorldHeight = effectiveWorldHeight; // Initialize effective world dimensions
         this.speed = speed;
         this.size = size;
         this.toroidal = toroidal;
@@ -61,11 +67,14 @@ public class Creature {
     }
 
     // Constructor for creating creatures with random initial position within world bounds
-    public Creature(String name, int worldWidth, int worldHeight, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy) {
+    public Creature(String name, float worldWidth, float worldHeight, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy) {
         this.id = idCounter.incrementAndGet();
         this.name = name;
-        this.x = random.nextFloat() * worldWidth;
-        this.y = random.nextFloat() * worldHeight;
+        // Store the passed worldWidth and worldHeight as the effective dimensions for this creature
+        this.creatureEffectiveWorldWidth = worldWidth;
+        this.creatureEffectiveWorldHeight = worldHeight;
+        this.x = random.nextFloat() * this.creatureEffectiveWorldWidth;
+        this.y = random.nextFloat() * this.creatureEffectiveWorldHeight;
         this.speed = speed;
         this.size = size;
         this.toroidal = toroidal;
@@ -92,7 +101,7 @@ public class Creature {
     }
 
     // The 'changeAngle' logic is part of move now
-    public void move(int worldWidth, int worldHeight) {
+    public void move(int ignoredWorldWidth, int ignoredWorldHeight) { // Parameters now potentially ignored if using stored effective dimensions
         if (!isAlive()) return;
 
         // Change direction slightly based on dirVariation
@@ -107,18 +116,18 @@ public class Creature {
         this.energy -= 0.1f; // Example cost
 
         if (toroidal) {
-            if (this.x < 0) this.x += worldWidth;
-            if (this.y < 0) this.y += worldHeight;
-            if (this.x >= worldWidth) this.x -= worldWidth;
-            if (this.y >= worldHeight) this.y -= worldHeight;
+            if (this.x < 0) this.x += this.creatureEffectiveWorldWidth;
+            if (this.y < 0) this.y += this.creatureEffectiveWorldHeight;
+            if (this.x >= this.creatureEffectiveWorldWidth) this.x -= this.creatureEffectiveWorldWidth;
+            if (this.y >= this.creatureEffectiveWorldHeight) this.y -= this.creatureEffectiveWorldHeight;
         } else {
             // Bounce off walls or clamp to edges if not toroidal
             if (this.x < 0) {
                 this.x = 0;
                 this.dx *= -1;
                 this.direction = (float) Math.atan2(this.dy, this.dx);
-            } else if (this.x >= worldWidth) {
-                this.x = worldWidth - 1;
+            } else if (this.x >= this.creatureEffectiveWorldWidth) {
+                this.x = this.creatureEffectiveWorldWidth - 1;
                 this.dx *= -1;
                 this.direction = (float) Math.atan2(this.dy, this.dx);
             }
@@ -127,8 +136,8 @@ public class Creature {
                 this.y = 0;
                 this.dy *= -1;
                 this.direction = (float) Math.atan2(this.dy, this.dx);
-            } else if (this.y >= worldHeight) {
-                this.y = worldHeight - 1;
+            } else if (this.y >= this.creatureEffectiveWorldHeight) {
+                this.y = this.creatureEffectiveWorldHeight - 1;
                 this.dy *= -1;
                 this.direction = (float) Math.atan2(this.dy, this.dx);
             }
@@ -212,19 +221,19 @@ public class Creature {
 
             Creature child = new Creature(
                 childName,
-                this.x + (random.nextFloat() * 20 - 10), // Spawn near parent
+                this.x + (random.nextFloat() * 20 - 10), // Spawn near parent, ensure it's clamped if needed or use effective dimensions for spawn logic too
                 this.y + (random.nextFloat() * 20 - 10), // Spawn near parent
                 childSpeed,
                 childSize,
                 this.toroidal, // Inherit toroidal nature
-                // Color is now generated in child's constructor
                 childGender,
                 childDirVariation,
                 childMaxAge,
                 childMutationRate,
                 childMaxOffspring,
-                childOffspringEnergy
-                // Note: Child's color will be generated by its own constructor using EcoUtils.generateHexColor()
+                childOffspringEnergy,
+                this.creatureEffectiveWorldWidth, // Pass effective dimensions to offspring
+                this.creatureEffectiveWorldHeight // Pass effective dimensions to offspring
             );
             child.setEnergy(this.offspringEnergy); // Start with initial energy portion
             offspringList.add(child);

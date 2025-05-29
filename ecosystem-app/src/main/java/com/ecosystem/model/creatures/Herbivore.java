@@ -10,15 +10,15 @@ public class Herbivore extends Creature {
     private static final float ENERGY_FROM_PLANT = 50; // Energy gained from eating a plant
     private static final float EAT_REACH = 5.0f; // How close to eat a plant
 
-    public Herbivore(String name, float x, float y, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy) {
-        super(name, x, y, speed, size, toroidal, gender, dirVariation, maxAge, mutationRate, maxOffspring, offspringEnergy);
-        setColor(EcoUtils.generateHexColor()); // Example: Herbivores are green, or use EcoUtils
+    public Herbivore(String name, float x, float y, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy, float effectiveWorldWidth, float effectiveWorldHeight) {
+        super(name, x, y, speed, size, toroidal, gender, dirVariation, maxAge, mutationRate, maxOffspring, offspringEnergy, effectiveWorldWidth, effectiveWorldHeight);
+        // Color is set in super constructor
     }
 
     // Constructor for random world position
-    public Herbivore(int worldWidth, int worldHeight, float speed, int size, boolean toroidal, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy) {
-        super(EcoUtils.nameGenerator(), worldWidth, worldHeight, speed, size, toroidal, EcoUtils.binaryGender(), dirVariation, maxAge, mutationRate, maxOffspring, offspringEnergy);
-        setColor(EcoUtils.generateHexColor());
+    public Herbivore(float effectiveWorldWidth, float effectiveWorldHeight, float speed, int size, boolean toroidal, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy) {
+        super(EcoUtils.nameGenerator(), effectiveWorldWidth, effectiveWorldHeight, speed, size, toroidal, EcoUtils.binaryGender(), dirVariation, maxAge, mutationRate, maxOffspring, offspringEnergy);
+        // Color is set in super constructor
     }
     
     public void eat(Plant plant) {

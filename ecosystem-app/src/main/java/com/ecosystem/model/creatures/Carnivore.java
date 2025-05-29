@@ -11,15 +11,15 @@ public class Carnivore extends Creature {
     private static final float HUNT_REACH = 10.0f; // How close to hunt a herbivore
     private static final float FIGHT_DAMAGE = 30; // Damage dealt in a fight
 
-    public Carnivore(String name, float x, float y, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy) {
-        super(name, x, y, speed, size, toroidal, gender, dirVariation, maxAge, mutationRate, maxOffspring, offspringEnergy);
-        setColor(EcoUtils.generateHexColor()); // Example: Carnivores are red
+    public Carnivore(String name, float x, float y, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy, float effectiveWorldWidth, float effectiveWorldHeight) {
+        super(name, x, y, speed, size, toroidal, gender, dirVariation, maxAge, mutationRate, maxOffspring, offspringEnergy, effectiveWorldWidth, effectiveWorldHeight);
+        // Color is set in super constructor
     }
     
     // Constructor for random world position
-    public Carnivore(int worldWidth, int worldHeight, float speed, int size, boolean toroidal, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy) {
-        super(EcoUtils.nameGenerator(), worldWidth, worldHeight, speed, size, toroidal, EcoUtils.binaryGender(), dirVariation, maxAge, mutationRate, maxOffspring, offspringEnergy);
-        setColor(EcoUtils.generateHexColor());
+    public Carnivore(float effectiveWorldWidth, float effectiveWorldHeight, float speed, int size, boolean toroidal, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy) {
+        super(EcoUtils.nameGenerator(), effectiveWorldWidth, effectiveWorldHeight, speed, size, toroidal, EcoUtils.binaryGender(), dirVariation, maxAge, mutationRate, maxOffspring, offspringEnergy);
+        // Color is set in super constructor
     }
 
     public void huntAndEat(Herbivore herbivore) {

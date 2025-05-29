@@ -9,21 +9,22 @@ import java.util.Random;
 public class Plant extends Creature {
     private static final float DEFAULT_PLANT_ENERGY_VALUE = 50; // Energy a herbivore gets from eating this plant
 
-    public Plant(float x, float y, int size, boolean toroidal, int maxAge) {
+    // Constructor for specific position (less common for initial plant setup, but could be used)
+    public Plant(float x, float y, int size, boolean toroidal, int maxAge, float effectiveWorldWidth, float effectiveWorldHeight) {
         // Plants might not need speed, dirVariation, complex mutation rates for these, maxOffspring, or offspringEnergy
         // Using NEUTRAL gender for plants
-        super(EcoUtils.nameGenerator(), x, y, 0, size, toroidal, Gender.NEUTRAL, 0, maxAge, 0.01f, 0, 0);
+        super(EcoUtils.nameGenerator(), x, y, 0, size, toroidal, Gender.NEUTRAL, 0, maxAge, 0.01f, 0, 0, effectiveWorldWidth, effectiveWorldHeight);
         setEnergy(100); // Plants start with some energy
         setHealth(50); // Plants have health
-        setColor(EcoUtils.generateHexColor()); // Specific color for plants, or pass a default
+        // Color is set in super constructor
     }
 
     // Constructor for random world position
-    public Plant(int worldWidth, int worldHeight, int size, boolean toroidal, int maxAge) {
-        super(EcoUtils.nameGenerator(), worldWidth, worldHeight, 0, size, toroidal, Gender.NEUTRAL, 0, maxAge, 0.01f, 0, 0);
+    public Plant(float effectiveWorldWidth, float effectiveWorldHeight, int size, boolean toroidal, int maxAge) {
+        super(EcoUtils.nameGenerator(), effectiveWorldWidth, effectiveWorldHeight, 0, size, toroidal, Gender.NEUTRAL, 0, maxAge, 0.01f, 0, 0);
         setEnergy(100);
         setHealth(50);
-        setColor(EcoUtils.generateHexColor());
+        // Color is set in super constructor
     }
     
     @Override

@@ -22,8 +22,10 @@ public class SimulationService {
     // Use CopyOnWriteArrayList for thread-safe reads in controller while updates happen in scheduled task
     private List<Creature> creatures = new CopyOnWriteArrayList<>();
     private Territory territory;
-    private final int worldWidth;
-    private final int worldHeight;
+    private final int canvasWorldWidth; // Renamed to reflect it's the canvas/conceptual size
+    private final int canvasWorldHeight; // Renamed to reflect it's the canvas/conceptual size
+    private final float effectiveSimWidth; // Actual simulation width based on territory
+    private final float effectiveSimHeight; // Actual simulation height based on territory
     private final int numPlants = 25;
     private final int numHerbivores = 15;
     private final int numCarnivores = 10;
@@ -35,21 +37,25 @@ public class SimulationService {
 
     // Default constructor for Spring, world size can be configured via properties or setters if needed
     public SimulationService() {
-        this.worldWidth = 800; // Default or load from config
-        this.worldHeight = 600; // Default or load from config
-        this.placeSize = Math.min(worldWidth / territoryGridWidth, worldHeight / territoryGridHeight);
+        this.canvasWorldWidth = 800; // Default or load from config
+        this.canvasWorldHeight = 600; // Default or load from config
+        this.placeSize = Math.min(canvasWorldWidth / territoryGridWidth, canvasWorldHeight / territoryGridHeight);
         this.territory = new Territory(territoryGridWidth, territoryGridHeight, placeSize);
+        this.effectiveSimWidth = this.territory.getWidth() * this.territory.getPlaceSize();
+        this.effectiveSimHeight = this.territory.getHeight() * this.territory.getPlaceSize();
         // creatures list is already initialized as CopyOnWriteArrayList
         initializeCreatures();
     }
 
     // Constructor that allows setting world size, useful for testing or specific configurations
-    public SimulationService(int worldWidth, int worldHeight) {
-        this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
-        this.placeSize = Math.min(worldWidth / territoryGridWidth, worldHeight / territoryGridHeight);
+    public SimulationService(int canvasWorldWidth, int canvasWorldHeight) {
+        this.canvasWorldWidth = canvasWorldWidth;
+        this.canvasWorldHeight = canvasWorldHeight;
+        this.placeSize = Math.min(this.canvasWorldWidth / territoryGridWidth, this.canvasWorldHeight / territoryGridHeight);
         // creatures list is already initialized as CopyOnWriteArrayList by class member initialization
         this.territory = new Territory(territoryGridWidth, territoryGridHeight, placeSize);
+        this.effectiveSimWidth = this.territory.getWidth() * this.territory.getPlaceSize();
+        this.effectiveSimHeight = this.territory.getHeight() * this.territory.getPlaceSize();
         initializeCreatures();
     }
 
@@ -59,7 +65,7 @@ public class SimulationService {
         // Initialize Plants
         for (int i = 0; i < numPlants; i++) {
             creatures.add(new Plant(
-                worldWidth, worldHeight, // world dimensions
+                effectiveSimWidth, effectiveSimHeight, // Use effective simulation dimensions
                 10 + random.nextInt(5),  // size (10-14)
                 true,                    // toroidal
                 600 + random.nextInt(401) // maxAge (600-1000)
@@ -69,7 +75,7 @@ public class SimulationService {
         // Initialize Herbivores
         for (int i = 0; i < numHerbivores; i++) {
             creatures.add(new Herbivore(
-                worldWidth, worldHeight,     // world dimensions
+                effectiveSimWidth, effectiveSimHeight,     // Use effective simulation dimensions
                 0.5f + random.nextFloat(),   // speed (0.5-1.5)
                 12 + random.nextInt(7),      // size (12-18)
                 true,                        // toroidal
@@ -84,7 +90,7 @@ public class SimulationService {
         // Initialize Carnivores
         for (int i = 0; i < numCarnivores; i++) {
             creatures.add(new Carnivore(
-                worldWidth, worldHeight,     // world dimensions
+                effectiveSimWidth, effectiveSimHeight,     // Use effective simulation dimensions
                 0.8f + random.nextFloat(),   // speed (0.8-1.8)
                 15 + random.nextInt(9),      // size (15-23)
                 true,                        // toroidal
@@ -115,7 +121,8 @@ public class SimulationService {
         // 1. Move creatures
         for (Creature creature : currentCreaturesSnapshot) {
             if (creature.isAlive()) {
-                creature.move(worldWidth, worldHeight);
+                // Pass canvasWorldWidth/Height, but Creature.move now uses its internal effective dimensions for wrapping
+                creature.move((int)canvasWorldWidth, (int)canvasWorldHeight); 
             }
         }
         
@@ -149,7 +156,9 @@ public class SimulationService {
                         if (currentCreaturesSnapshot.contains(c1) && c1.isAlive() &&
                             currentCreaturesSnapshot.contains(c2) && c2.isAlive()) {
                             
-                            List<Creature> c1Offspring = c1.solveEncounter(c2, worldWidth, worldHeight);
+                            // Pass effectiveSimWidth/Height to solveEncounter if it needs world dimensions for spawning, etc.
+                            // Creature.reproduce now uses the parent's effective dimensions.
+                            List<Creature> c1Offspring = c1.solveEncounter(c2, (int)effectiveSimWidth, (int)effectiveSimHeight);
                             if (c1Offspring != null && !c1Offspring.isEmpty()) {
                                 newOffspring.addAll(c1Offspring);
                             }
@@ -186,11 +195,19 @@ public class SimulationService {
         return territory;
     }
     
-    public int getWorldWidth() {
-        return worldWidth;
+    public int getCanvasWorldWidth() {
+        return canvasWorldWidth;
     }
 
-    public int getWorldHeight() {
-        return worldHeight;
+    public int getCanvasWorldHeight() {
+        return canvasWorldHeight;
+    }
+    
+    public float getEffectiveSimWidth(){
+        return effectiveSimWidth;
+    }
+
+    public float getEffectiveSimHeight(){
+        return effectiveSimHeight;
     }
 }
