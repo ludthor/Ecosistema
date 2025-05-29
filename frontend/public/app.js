@@ -12,8 +12,9 @@ let creaturesCache = [];
 // --- P5.js Structure ---
 
 function setup() {
-    createCanvas(windowWidth, windowHeight); // Use P5.js windowWidth and windowHeight
-    console.log("P5.js setup complete. Canvas created at window dimensions:", windowWidth, "x", windowHeight);
+    let cnv = createCanvas(windowWidth, windowHeight); // Use P5.js windowWidth and windowHeight
+    cnv.parent('canvas-parent'); // Tell P5 to put canvas in this div
+    console.log("P5.js setup complete. Canvas created in #canvas-parent at window dimensions:", windowWidth, "x", windowHeight);
     
     // Initial fetch of creatures
     fetchCreatures().then(data => {
@@ -49,7 +50,18 @@ function windowResized() {
 }
 
 function draw() {
-    background(220); // Clear background with light gray
+    // New solid background color (light, slightly cool off-white)
+    background(245, 248, 250); 
+
+    // --- OR a simple linear gradient example (comment out the solid background above if using this) ---
+    // for (let i = 0; i < height; i++) {
+    //   let inter = map(i, 0, height, 0, 1);
+    //   let c = lerpColor(color(230, 235, 240), color(250, 255, 255), inter); // Light gray to off-white
+    //   stroke(c);
+    //   line(0, i, width, i);
+    // }
+    // noStroke(); // Reset stroke after gradient
+    // --- End gradient example ---
 
     if (creaturesCache.length > 0) {
         for (let creature of creaturesCache) {
@@ -68,45 +80,79 @@ function drawP5Creature(creature) {
         return;
     }
 
-    let creatureColorValue; 
-    let shapeType = 'rect'; 
     let p5DrawSize = creature.size;
+
+    // Common modes, can be set once if all use CENTER, or per shape
+    rectMode(CENTER);
+    ellipseMode(CENTER);
 
     switch (creature.type) {
         case 'Plant':
-            creatureColorValue = color(0, 128, 0); 
-            shapeType = 'rect';
+            fill(100, 200, 100);      // Medium green body
+            stroke(50, 150, 50);      // Darker green stroke
+            strokeWeight(Math.max(1, p5DrawSize * 0.05)); // Proportional stroke, min 1px
+            rect(creature.x, creature.y, p5DrawSize, p5DrawSize, p5DrawSize * 0.2); // Rounded corners
+
+            // Optional detail: darker green circle
+            noStroke(); // No stroke for the detail
+            fill(50, 150, 50, 180); // Darker green, slightly transparent
+            ellipse(creature.x, creature.y, p5DrawSize * 0.3, p5DrawSize * 0.3);
             break;
+
         case 'Herbivore':
-            creatureColorValue = color(0, 0, 255); 
-            shapeType = 'circle';
+            fill(100, 150, 255); // Softer blue
+            noStroke();
+            ellipse(creature.x, creature.y, p5DrawSize, p5DrawSize * 0.8); // Squashed ellipse
+
+            // Optional detail: eye
+            fill(255); // White eye
+            // Simple eye: ensure it scales with p5DrawSize and is positioned relative to center
+            // For a more dynamic eye based on direction:
+            // let eyeOffsetX = p5DrawSize * 0.15 * (creature.dx / (abs(creature.dx) + abs(creature.dy) || 1));
+            // let eyeOffsetY = p5DrawSize * 0.15 * (creature.dy / (abs(creature.dx) + abs(creature.dy) || 1));
+            // ellipse(creature.x + eyeOffsetX, creature.y + eyeOffsetY, p5DrawSize * 0.15, p5DrawSize * 0.2);
+            // Simplified static eye:
+            ellipse(creature.x + p5DrawSize * 0.15, creature.y - p5DrawSize * 0.1, p5DrawSize * 0.12, p5DrawSize * 0.18);
             break;
+
         case 'Carnivore':
-            creatureColorValue = color(255, 0, 0); 
-            shapeType = 'circle';
+            let carnivoreBodyColor = color(200, 50, 50); // Nuanced red
+            let carnivoreEarColor = color(150, 30, 30, 230); // Darker shade for ears, slightly transparent
+            
+            noStroke();
+            
+            // Body
+            fill(carnivoreBodyColor);
+            ellipse(creature.x, creature.y, p5DrawSize, p5DrawSize); // Main body ellipse
+
+            // Simpler ears on top, slightly offset towards top.
+            // For orientation with movement, push/translate/rotate/pop would be needed around this block.
+            fill(carnivoreEarColor);
+            let earSize = p5DrawSize * 0.4;
+            let earOffset = p5DrawSize * 0.3; // How far from center the ears are placed
+            
+            // Simple ears without rotation for now
+            ellipse(creature.x - earOffset, creature.y - earOffset, earSize, earSize);
+            ellipse(creature.x + earOffset, creature.y - earOffset, earSize, earSize);
             break;
+            
         default:
+            // Existing default logic for unknown types or base "Creature"
+            let defaultColorValue;
             if (creature.color && typeof creature.color === 'string' && creature.color.startsWith('#')) {
                 try {
-                    creatureColorValue = color(creature.color); 
+                    defaultColorValue = color(creature.color); 
                 } catch (e) {
-                    creatureColorValue = color(128); 
+                    defaultColorValue = color(128); // Grey if hex is invalid
                 }
             } else {
-                creatureColorValue = color(128); 
+                defaultColorValue = color(128); // Grey
             }
+            fill(defaultColorValue);
+            noStroke(); 
+            rectMode(CENTER); // Ensure rect mode is center for default
+            rect(creature.x, creature.y, p5DrawSize, p5DrawSize); // Default to a square
             break;
-    }
-
-    fill(creatureColorValue);
-    noStroke(); 
-
-    if (shapeType === 'rect') {
-        rectMode(CENTER);
-        rect(creature.x, creature.y, p5DrawSize, p5DrawSize);
-    } else if (shapeType === 'circle') {
-        ellipseMode(CENTER);
-        ellipse(creature.x, creature.y, p5DrawSize, p5DrawSize); 
     }
     
     // console.log(`P5 Draw: type=${creature.type}, shape=${shapeType}, color=${creatureColorValue.toString()}, x=${creature.x}, y=${creature.y}, size=${p5DrawSize}`);

@@ -9,11 +9,15 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Ecosystem Simulator</h1>
-    <canvas id="simulationCanvas"></canvas>
-    <div style="position: fixed; bottom: 10px; left: 10px; z-index: 100;">
-        <button id="downloadCanvasBtn">Download Canvas</button>
-    </div>
+    <main id="app-container">
+        <h1>Ecosystem Simulator</h1> <!-- Kept the H1, moved into app-container -->
+        <div id="canvas-parent" style="/* CSS will handle its sizing and positioning */">
+            <!-- P5.js will insert its canvas here -->
+        </div>
+        <div id="ui-controls" style="position: fixed; bottom: 10px; left: 10px; z-index: 100;">
+            <button id="downloadCanvasBtn">Download Canvas</button>
+        </div>
+    </main>
     <script src="app.js"></script>
 </body>
 </html>
