@@ -27,26 +27,30 @@ async function fetchCreatures() {
 }
 
 function drawCreature(creature) {
-    console.log('Drawing creature:', creature); // Added log
+    console.log('Drawing creature:', creature); // Original first log, restored
+
+    if (!creature || typeof creature.x !== 'number' || typeof creature.y !== 'number' || typeof creature.size !== 'number' ) {
+        console.error("Invalid creature data for drawing (missing x, y, or size):", creature);
+        return; 
+    }
+
     let creatureColor = creature.color; // Default to its given color from backend (which is random hex)
-    let shape = 'rect'; // Default shape
-    let drawSize = creature.size; // Default size
+    // let shape = 'rect'; // Shape logic still commented out for this step
+    // let drawSize = creature.size; // Size logic still commented out for this step
 
     // Determine color and shape based on type, overriding the random hex color for specific types
     switch (creature.type) {
         case 'Plant':
             creatureColor = 'green';
-            shape = 'rect'; // Plants are squares
-            // Plants could be slightly larger or have a fixed size for visibility
-            // drawSize = 10; // Optional: override size for plants
+            // shape = 'rect'; // Keep commented
             break;
         case 'Herbivore':
             creatureColor = 'blue';
-            shape = 'circle'; // Herbivores are circles
+            // shape = 'circle'; // Keep commented
             break;
         case 'Carnivore':
             creatureColor = 'red';
-            shape = 'circle'; // Carnivores are circles
+            // shape = 'circle'; // Keep commented
             break;
         default:
             // For base "Creature" type if any, or unknown types
@@ -57,6 +61,31 @@ function drawCreature(creature) {
 
     ctx.fillStyle = creatureColor;
     
+    let drawSize = creature.size; // Dynamic sizing is already restored
+
+    // ---- Restore Shape Logic ----
+    let shape = 'rect'; // Default shape
+    switch (creature.type) {
+        case 'Plant':
+            // creatureColor = 'green'; // Already handled by prior switch
+            shape = 'rect'; 
+            break;
+        case 'Herbivore':
+            // creatureColor = 'blue'; // Already handled by prior switch
+            shape = 'circle'; 
+            break;
+        case 'Carnivore':
+            // creatureColor = 'red'; // Already handled by prior switch
+            shape = 'circle'; 
+            break;
+        // default for color is handled, shape defaults to rect
+    }
+    // ---- End Restore Shape Logic ----
+
+    // Restore the detailed log to its full original form (or the one from Step 2 of this plan)
+    console.log(`Restored Shapes - Attempting draw: type=${creature.type}, shape=${shape}, color=${ctx.fillStyle}, x=${creature.x}, y=${creature.y}, size=${drawSize}`);
+
+    // ---- Restore Conditional Drawing ----
     if (shape === 'rect') {
         ctx.fillRect(creature.x - drawSize / 2, creature.y - drawSize / 2, drawSize, drawSize);
     } else if (shape === 'circle') {
@@ -64,6 +93,7 @@ function drawCreature(creature) {
         ctx.arc(creature.x, creature.y, drawSize / 2, 0, Math.PI * 2);
         ctx.fill();
     }
+    // ---- End Restore Conditional Drawing ----
 
     // Optional: Draw health bar or energy level (can be added later)
     // Example:
