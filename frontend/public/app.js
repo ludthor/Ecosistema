@@ -2,8 +2,10 @@ const canvas = document.getElementById('simulationCanvas');
 const ctx = canvas.getContext('2d');
 
 // Set canvas dimensions (should match backend simulation dimensions if possible)
-canvas.width = 800;
-canvas.height = 500;
+// canvas.width = 800; // Old value
+// canvas.height = 500; // Old value
+canvas.width = 600;  // New value, matching example effectiveSimWidth
+canvas.height = 600; // New value, matching example effectiveSimHeight
 
 const backendUrl = 'http://localhost:8080/api/simulation/state'; // Assuming Spring Boot runs on 8080
 let creaturesCache = []; // Cache for storing fetched creatures
@@ -11,10 +13,13 @@ let creaturesCache = []; // Cache for storing fetched creatures
 async function fetchCreatures() {
     try {
         const response = await fetch(backendUrl);
+        console.log('API Response Status:', response.status); // Added log
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return await response.json();
+        const data = await response.json();
+        console.log('Fetched creatures data (parsed JSON):', data); // Added log
+        return data;
     } catch (error) {
         console.error("Could not fetch creatures:", error);
         return []; // Return empty array on error
@@ -22,6 +27,7 @@ async function fetchCreatures() {
 }
 
 function drawCreature(creature) {
+    console.log('Drawing creature:', creature); // Added log
     let creatureColor = creature.color; // Default to its given color from backend (which is random hex)
     let shape = 'rect'; // Default shape
     let drawSize = creature.size; // Default size
@@ -73,7 +79,8 @@ async function gameLoop() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const fetchedCreatures = await fetchCreatures();
+    const fetchedCreatures = await fetchCreatures(); // Renamed to avoid conflict with global 'creatures' if any
+    console.log('Creatures received in gameLoop:', fetchedCreatures); // Added log
     creaturesCache = fetchedCreatures; // Update cache
     
     creaturesCache.forEach(creature => {
