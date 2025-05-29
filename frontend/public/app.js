@@ -2,10 +2,10 @@ const canvas = document.getElementById('simulationCanvas');
 const ctx = canvas.getContext('2d');
 
 // Set canvas dimensions (should match backend simulation dimensions if possible)
-// canvas.width = 800; // Old value
-// canvas.height = 500; // Old value
-canvas.width = 600;  // New value, matching example effectiveSimWidth
-canvas.height = 600; // New value, matching example effectiveSimHeight
+// canvas.width = 600;  // Old value
+// canvas.height = 600; // Old value
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 const backendUrl = 'http://localhost:8080/api/simulation/state'; // Assuming Spring Boot runs on 8080
 let creaturesCache = []; // Cache for storing fetched creatures
@@ -109,6 +109,28 @@ async function gameLoop() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // --- Start Fixed Background Art for Debugging ---
+    ctx.fillStyle = 'lightgray';
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill background with light gray
+
+    ctx.fillStyle = 'red';
+    ctx.fillRect(10, 10, 50, 50); // Draw a red square at top-left
+
+    ctx.fillStyle = 'blue';
+    ctx.beginPath();
+    ctx.arc(canvas.width - 60, 60, 50, 0, Math.PI * 2); // Draw a blue circle at top-right
+    ctx.fill();
+
+    ctx.strokeStyle = 'green';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height / 2);
+    ctx.lineTo(canvas.width, canvas.height / 2); // Draw a green horizontal line in the middle
+    ctx.stroke();
+    
+    console.log('Attempted to draw fixed background art.');
+    // --- End Fixed Background Art for Debugging ---
+
     const fetchedCreatures = await fetchCreatures(); // Renamed to avoid conflict with global 'creatures' if any
     console.log('Creatures received in gameLoop:', fetchedCreatures); // Added log
     creaturesCache = fetchedCreatures; // Update cache
@@ -165,3 +187,26 @@ canvas.addEventListener('click', function(event) {
 
 // Start the simulation loop
 gameLoop();
+
+const downloadButton = document.getElementById('downloadCanvasBtn');
+
+if (downloadButton) {
+    downloadButton.addEventListener('click', function() {
+        // Get the data URL of the canvas
+        const dataURL = canvas.toDataURL('image/png');
+
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'ecosystem_snapshot.png'; // Filename for the download
+
+        // Programmatically click the link to trigger the download
+        document.body.appendChild(link); // Required for Firefox
+        link.click();
+        document.body.removeChild(link); // Clean up
+        
+        console.log('Canvas download initiated.');
+    });
+} else {
+    console.warn('Download button not found.');
+}

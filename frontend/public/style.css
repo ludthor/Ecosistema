@@ -1,3 +1,23 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scrollbars if canvas fits perfectly */
+    height: 100%;
+    width: 100%;
+    background-color: #333; /* Optional: dark background for area outside canvas if any */
+    display: block; /* Ensure body itself doesn't cause issues, though canvas will be main content */
+}
+
+canvas {
+    display: block; /* Removes extra space below canvas if it's inline */
+    /* width and height will be set by JavaScript */
+    /* Remove previous border and background if they conflict with full-page view */
+    /* border: 1px solid black; */
+    /* background-color: #ffffff; */
+}
+
+/* Remove or comment out previous body styling if it conflicts */
+/*
 body {
     font-family: sans-serif;
     display: flex;
@@ -6,7 +26,4 @@ body {
     margin: 0;
     background-color: #f0f0f0;
 }
-canvas {
-    border: 1px solid black;
-    background-color: #ffffff;
-}
+*/
