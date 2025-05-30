@@ -77,6 +77,24 @@ input, button, textarea, select {
 
 /* Specific styles for the application elements */
 
+#app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 15px; /* Consistent padding */
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--card-border-color);
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+#main-content-area {
+    display: flex;
+    flex-direction: row; /* Arrange simulation and info panels horizontally */
+    flex-grow: 1; /* Take remaining vertical space after header */
+    overflow: hidden; /* Prevent internal scrollbars if children are too large */
+    /* height: calc(100% - 50px); /* Example if header height is fixed, but flex-grow on app-container children is better */
+}
+
 #app-container {
     width: 100%;
     height: 100%;
@@ -90,27 +108,27 @@ input, button, textarea, select {
     /* position: absolute; remove or adjust if it should not overlay simulation-panel */
     /* top: 10px; */
     /* For now, let's make it a static part of the layout */
-    text-align: center; /* Example adjustment */
-    padding: 10px; /* Example adjustment */
-    background-color: var(--header-background); /* Use themed background */
-    color: var(--header-text); /* Use themed text */
-    z-index: 10; /* Keep it above other elements if needed, though less relevant if static */
-    /* transform: translateX(-50%); remove if not absolute centered */
-    /* left: 50%; remove if not absolute centered */
-    border-radius: 0; /* Remove border-radius if it's a full-width header bar */
-    font-size: 1.2em;
-    margin-bottom: 5px; /* Add some margin if it's a static block */
+    /* text-align: center; Will be aligned by header flex */
+    /* padding: 10px; Header will have padding */
+    /* background-color: var(--header-background); Header will have background */
+    color: var(--text-color); /* Use standard text color for header title */
+    /* z-index: 10; Not needed */
+    /* border-radius: 0; Not needed */
+    font-size: 1.4em; /* Slightly larger for app title */
+    margin: 0; /* Remove default h1 margins */
+    font-weight: bold; /* Ensure it's bold */
 }
 
 
 #simulation-panel {
     display: flex;
     flex-direction: column;
-    /* flex-grow: 1; Take up remaining space */
-    flex-basis: 75vh; /* Approx 75% of viewport height, adjust as needed */
+    flex-grow: 7; /* Takes 7 parts of the space */
+    flex-basis: 0; /* Base size before growing */
     /* min-height: 0; Important for flex children that might overflow */
     overflow: hidden; /* Prevent canvas from causing scroll */
     position: relative; /* For potential absolute positioning of children like h1 if it were to overlay */
+    height: 100%; /* Ensure it tries to fill the height of main-content-area */
 }
 
 #canvas-parent {
@@ -131,16 +149,17 @@ input, button, textarea, select {
 }
 
 #info-panel {
-    /* flex-grow: 1; If simulation-panel has fixed basis, this takes rest */
-    flex-basis: calc(25vh - 20px - 5px); /* Remaining height minus h1 padding and margin, adjust as needed */
-    /* min-height: 150px; Or some other minimum */
+    flex-grow: 3; /* Takes 3 parts of the space */
+    flex-basis: 0; /* Base size before growing */
+    /* flex-shrink: 0; No longer needed with flex-grow */
+    height: 100%; /* Ensure it tries to fill the height of main-content-area */
     overflow-y: auto; /* Scroll if content exceeds panel height */
     padding: 15px;
     background-color: var(--card-background-color);
-    border-top: 1px solid var(--card-border-color); /* Or use 'border' for all sides */
-    box-shadow: 0 -2px 5px var(--shadow-color); /* Shadow on top edge */
+    border-left: 1px solid var(--card-border-color); /* Changed from border-top */
+    box-shadow: -2px 0 5px var(--shadow-color); /* Shadow on left edge */
     color: var(--card-text-color);
-    border-radius: 8px 8px 0 0; /* Rounded corners on top */
+    border-radius: 8px 0 0 8px; /* Rounded corners on left */
 }
 
 /* This rule is redundant as #app-container h1 is styled earlier as a static block.
@@ -218,19 +237,19 @@ input, button, textarea, select {
 }
 
 #ui-controls { 
-    padding: 10px; /* Increased padding */
+    /* padding: 10px; No longer needed, header has padding */
     display: flex;
-    justify-content: center; /* Center buttons */
+    /* justify-content: center; No longer needed, header uses space-between */
     align-items: center;
-    gap: 10px; /* Space between buttons */
-    background-color: var(--background-color); /* Give it a background matching the theme */
-    border-top: 1px solid var(--card-border-color); /* Subtle separator */
+    gap: 10px; /* Space between buttons is good */
+    /* background-color: var(--background-color); No longer needed */
+    /* border-top: 1px solid var(--card-border-color); No longer needed */
 }
 
 /* Adjust button styles if needed, they should mostly inherit well */
 #ui-controls button {
-    font-size: 0.9em; /* Already set on #downloadCanvasBtn, ensure consistency */
-    /* padding: 10px 15px; Already set on #downloadCanvasBtn */
+    font-size: 0.85em; /* Slightly smaller for header context */
+    padding: 6px 10px; /* Adjust padding for smaller buttons */
     /* border-radius: 5px; Already set on #downloadCanvasBtn */
     /* cursor: pointer; Already set on #downloadCanvasBtn */
     /* box-shadow: 0 2px 4px var(--shadow-color); Already set on #downloadCanvasBtn */
