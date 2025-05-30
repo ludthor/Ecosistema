@@ -8,10 +8,17 @@
 
 const backendUrl = 'http://localhost:8080/api/simulation/state';
 let creaturesCache = []; 
+let p5CanvasBackgroundColor; // Global variable for P5.js canvas background
+
+// Helper function to read CSS variables
+function getCSSVariable(varName) {
+    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+}
 
 // --- P5.js Structure ---
 
 function setup() {
+    p5CanvasBackgroundColor = color(getCSSVariable('--background-color')); // Initialize with theme color
     let cnv = createCanvas(windowWidth, windowHeight); // Use P5.js windowWidth and windowHeight
     cnv.parent('canvas-parent'); // Tell P5 to put canvas in this div
     console.log("P5.js setup complete. Canvas created in #canvas-parent at window dimensions:", windowWidth, "x", windowHeight);
@@ -50,8 +57,12 @@ function windowResized() {
 }
 
 function draw() {
-    // New solid background color (light, slightly cool off-white)
-    background(245, 248, 250); 
+    if (p5CanvasBackgroundColor) {
+        background(p5CanvasBackgroundColor);
+    } else {
+        // Fallback if somehow not set, though setup() should handle it.
+        background(245, 248, 250); 
+    }
 
     // --- OR a simple linear gradient example (comment out the solid background above if using this) ---
     // for (let i = 0; i < height; i++) {
@@ -199,5 +210,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else {
         console.warn('Download button #downloadCanvasBtn not found.');
+    }
+
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const body = document.body;
+    const currentThemeKey = 'themePreference';
+
+    // Function to apply theme and update button
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            themeToggleBtn.textContent = 'Switch to Light Mode';
+        } else {
+            body.classList.remove('dark-mode');
+            themeToggleBtn.textContent = 'Switch to Dark Mode';
+        }
+        // Update P5.js canvas background after DOM update
+        // Use requestAnimationFrame to ensure styles are applied before reading them
+        requestAnimationFrame(() => {
+            p5CanvasBackgroundColor = color(getCSSVariable('--background-color'));
+            console.log('P5.js canvas background updated to:', p5CanvasBackgroundColor.toString());
+        });
+    };
+
+    // Load saved theme preference
+    const savedTheme = localStorage.getItem(currentThemeKey);
+    // Apply initial theme (this will also set the initial canvas background via the updated applyTheme)
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else {
+        // Default to light as per initial CSS setup
+        applyTheme('light'); 
+    }
+    // p5CanvasBackgroundColor will be set by P5.js setup() using the theme applied above,
+    // and subsequent changes are handled by the themeToggleBtn listener.
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            let newTheme;
+            if (body.classList.contains('dark-mode')) {
+                newTheme = 'light';
+            } else {
+                newTheme = 'dark';
+            }
+            applyTheme(newTheme);
+            localStorage.setItem(currentThemeKey, newTheme);
+            console.log(`Theme switched to ${newTheme}. Preference saved.`);
+        });
+    } else {
+        console.warn('Theme toggle button #themeToggleBtn not found.');
     }
 });

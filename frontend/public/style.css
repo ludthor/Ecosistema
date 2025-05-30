@@ -1,3 +1,28 @@
+:root {
+    --background-color: #ffffff;
+    --text-color: #333333;
+    --primary-button-background: #007bff;
+    --primary-button-text: #ffffff;
+    --primary-button-hover-background: #0056b3;
+    --primary-button-active-background: #004085;
+    --header-background: rgba(255, 255, 255, 0.8);
+    --header-text: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode styles triggered by 'dark-mode' class on body */
+body.dark-mode {
+    --background-color: #222222;
+    --text-color: #eeeeee;
+    /* Optional: Adjust button colors for dark mode if needed */
+    /* --primary-button-background: #1a8cff; */
+    /* --primary-button-hover-background: #007bff; */
+    /* --primary-button-active-background: #0056b3; */
+    --header-background: rgba(0, 0, 0, 0.5);
+    --header-text: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
 /* Simple CSS Reset */
 *, *::before, *::after {
     box-sizing: border-box;
@@ -17,8 +42,8 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased; /* Optional: for smoother fonts on some displays */
-    background-color: #222; /* Dark gray background for the page */
-    color: #eee; /* Light text color for any potential text outside canvas (e.g. h1) */
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
 
 img, picture, video, canvas, svg {
@@ -52,8 +77,8 @@ input, button, textarea, select {
     left: 50%;
     transform: translateX(-50%); /* Center horizontally */
     z-index: 10; /* Ensure it's above the canvas */
-    color: #fff; 
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    color: var(--header-text);
+    background-color: var(--header-background);
     padding: 8px 15px;
     border-radius: 5px;
     font-size: 1.2em;
@@ -66,24 +91,24 @@ input, button, textarea, select {
 }
 
 #downloadCanvasBtn {
-    background-color: #007bff; 
-    color: white;
+    background-color: var(--primary-button-background);
+    color: var(--primary-button-text);
     border: none;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9em;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px var(--shadow-color);
     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 #downloadCanvasBtn:hover {
-    background-color: #0056b3; 
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    background-color: var(--primary-button-hover-background);
+    box-shadow: 0 4px 8px var(--shadow-color); /* Adjusted shadow for hover */
 }
 
 #downloadCanvasBtn:active {
-    background-color: #004085; 
+    background-color: var(--primary-button-active-background);
 }
 
 /* Commented out original canvas-specific styles as P5 now controls canvas directly */
