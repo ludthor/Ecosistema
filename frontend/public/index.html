@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecosystem Simulator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script> -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main id="app-container">
+        <header id="app-header">
+            <h1>Ecosystem Simulator</h1>
+            <div id="ui-controls"> 
+                <button id="downloadCanvasBtn">Download Canvas</button>
+                <button id="themeToggleBtn">Toggle Theme</button>
+            </div>
+        </header>
+        
+        <div id="main-content-area">
+            <div id="simulation-panel">
+                <div id="canvas-parent">
+                    <!-- P5.js will insert its canvas here -->
+                </div>
+                <!-- ui-controls moved to app-header -->
+            </div>
+
+            <div id="info-panel">
+                <p class="info-panel-placeholder">Click on a creature in the simulation to see its details here.</p>
+            </div>
+        </div>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>

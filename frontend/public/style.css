@@ -1,0 +1,320 @@
+:root {
+    --background-color: #ffffff;
+    --text-color: #333333;
+    --primary-button-background: #007bff;
+    --primary-button-text: #ffffff;
+    --primary-button-hover-background: #0056b3;
+    --primary-button-active-background: #004085;
+    --header-background: rgba(255, 255, 255, 0.8);
+    --header-text: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    /* Card specific variables */
+    --card-background-color: #f8f9fa;
+    --card-border-color: #dee2e6;
+    --card-text-color: var(--text-color); /* Use general text color for cards by default */
+    /* Creature Icon Colors */
+    --plant-icon-color: #28a745;
+    --herbivore-icon-color: #17a2b8;
+    --carnivore-icon-color: #dc3545;
+    --icon-text-color: #ffffff; /* For text on icon backgrounds */
+}
+
+/* Dark mode styles triggered by 'dark-mode' class on body */
+body.dark-mode {
+    --background-color: #222222;
+    --text-color: #eeeeee;
+    /* Optional: Adjust button colors for dark mode if needed */
+    /* --primary-button-background: #1a8cff; */
+    /* --primary-button-hover-background: #007bff; */
+    /* --primary-button-active-background: #0056b3; */
+    --header-background: rgba(0, 0, 0, 0.5);
+    --header-text: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    /* Card specific variables for dark mode */
+    --card-background-color: #2a2f34; /* Darker card background */
+    --card-border-color: #495057;
+    --card-text-color: var(--text-color); /* Use general text color for cards by default */
+    /* Creature Icon Colors in Dark Mode (can be same or adjusted) */
+    /* For now, keeping them the same as they are sufficiently contrasting */
+    /* --plant-icon-color: #38b755; */
+    /* --herbivore-icon-color: #27b2c8; */
+    /* --carnivore-icon-color: #ec4555; */
+    /* --icon-text-color: #ffffff; */
+}
+
+/* Simple CSS Reset */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    /* Apply 100% height to html to allow body to correctly use 100% height */
+    height: 100%; 
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Good for full-page canvas app */
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased; /* Optional: for smoother fonts on some displays */
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+img, picture, video, canvas, svg {
+    display: block; /* Canvas was already block, this reinforces for other media */
+    max-width: 100%;
+}
+
+input, button, textarea, select {
+    font: inherit;
+}
+/* End Simple CSS Reset */
+
+/* Specific styles for the application elements */
+
+#app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 15px; /* Consistent padding */
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--card-border-color);
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+#main-content-area {
+    display: flex;
+    flex-direction: row; /* Arrange simulation and info panels horizontally */
+    flex-grow: 1; /* Take remaining vertical space after header */
+    overflow: hidden; /* Prevent internal scrollbars if children are too large */
+    /* height: calc(100% - 50px); /* Example if header height is fixed, but flex-grow on app-container children is better */
+}
+
+#app-container {
+    width: 100%;
+    height: 100%;
+    display: flex; 
+    flex-direction: column;
+    overflow: hidden; /* Prevent scrollbars if panels are precisely sized */
+}
+
+/* Make h1 part of the flex flow or adjust its positioning if it overlays */
+#app-container h1 { 
+    /* position: absolute; remove or adjust if it should not overlay simulation-panel */
+    /* top: 10px; */
+    /* For now, let's make it a static part of the layout */
+    /* text-align: center; Will be aligned by header flex */
+    /* padding: 10px; Header will have padding */
+    /* background-color: var(--header-background); Header will have background */
+    color: var(--text-color); /* Use standard text color for header title */
+    /* z-index: 10; Not needed */
+    /* border-radius: 0; Not needed */
+    font-size: 1.4em; /* Slightly larger for app title */
+    margin: 0; /* Remove default h1 margins */
+    font-weight: bold; /* Ensure it's bold */
+}
+
+
+#simulation-panel {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 7; /* Takes 7 parts of the space */
+    flex-basis: 0; /* Base size before growing */
+    /* min-height: 0; Important for flex children that might overflow */
+    overflow: hidden; /* Prevent canvas from causing scroll */
+    position: relative; /* For potential absolute positioning of children like h1 if it were to overlay */
+    height: 100%; /* Ensure it tries to fill the height of main-content-area */
+}
+
+#canvas-parent {
+    flex-grow: 1; /* Allow canvas-parent to fill the simulation-panel */
+    width: 100%; 
+    /* height: 100%; Is already set, flex-grow should handle vertical fill */
+    position: relative; /* Already set, good for canvas positioning */
+    display: flex; /* To center canvas if it's smaller than parent */
+    justify-content: center; /* Center canvas horizontally */
+    align-items: center; /* Center canvas vertically */
+}
+
+/* Ensure P5 canvas itself adheres to the parent size */
+#canvas-parent > canvas {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Or 'scale-down' if you want to ensure it fits without cropping */
+}
+
+#info-panel {
+    flex-grow: 3; /* Takes 3 parts of the space */
+    flex-basis: 0; /* Base size before growing */
+    /* flex-shrink: 0; No longer needed with flex-grow */
+    height: 100%; /* Ensure it tries to fill the height of main-content-area */
+    overflow-y: auto; /* Scroll if content exceeds panel height */
+    padding: 15px;
+    background-color: var(--card-background-color);
+    border-left: 1px solid var(--card-border-color); /* Changed from border-top */
+    box-shadow: -2px 0 5px var(--shadow-color); /* Shadow on left edge */
+    color: var(--card-text-color);
+    border-radius: 8px 0 0 8px; /* Rounded corners on left */
+}
+
+/* This rule is redundant as #app-container h1 is styled earlier as a static block.
+#app-container h1 { /* Targets the h1 within app-container * /
+    position: absolute; 
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%); /* Center horizontally * /
+    z-index: 10; /* Ensure it's above the canvas * /
+    color: var(--header-text);
+    background-color: var(--header-background);
+    /* padding: 8px 15px; * / /* Handled by the new h1 rule above * /
+    /* border-radius: 5px; * / /* Handled by the new h1 rule above * /
+    /* font-size: 1.2em; * / /* Handled by the new h1 rule above * /
+}
+*/
+
+/* Styles for Creature Info Panel Content */
+.creature-details-card {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: var(--background-color); /* Slightly different from info-panel's card bg for depth */
+    border: 1px solid var(--card-border-color);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+.creature-details-card:last-child {
+    margin-bottom: 0;
+}
+
+.creature-icon-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* Circular icon */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: var(--icon-text-color);
+    margin-right: 15px;
+    flex-shrink: 0; /* Prevent shrinking */
+    background-color: var(--plant-icon-color); /* Default to plant */
+}
+
+.creature-icon-placeholder.herbivore {
+    background-color: var(--herbivore-icon-color);
+}
+
+.creature-icon-placeholder.carnivore {
+    background-color: var(--carnivore-icon-color);
+}
+
+.creature-info {
+    flex-grow: 1;
+}
+
+.creature-name {
+    margin: 0 0 5px 0;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--card-text-color); /* Explicitly use card text color */
+}
+
+.creature-attribute {
+    margin: 0 0 3px 0;
+    font-size: 0.9em;
+    color: var(--card-text-color); /* Explicitly use card text color */
+}
+
+.creature-attribute span {
+    font-weight: normal; /* Ensure value part is not bold if label part is made bold later */
+}
+
+#ui-controls { 
+    /* padding: 10px; No longer needed, header has padding */
+    display: flex;
+    /* justify-content: center; No longer needed, header uses space-between */
+    align-items: center;
+    gap: 10px; /* Space between buttons is good */
+    /* background-color: var(--background-color); No longer needed */
+    /* border-top: 1px solid var(--card-border-color); No longer needed */
+}
+
+/* Adjust button styles if needed, they should mostly inherit well */
+#ui-controls button {
+    font-size: 0.85em; /* Slightly smaller for header context */
+    padding: 6px 10px; /* Adjust padding for smaller buttons */
+    /* border-radius: 5px; Already set on #downloadCanvasBtn */
+    /* cursor: pointer; Already set on #downloadCanvasBtn */
+    /* box-shadow: 0 2px 4px var(--shadow-color); Already set on #downloadCanvasBtn */
+    /* transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; Already set */
+}
+
+#downloadCanvasBtn {
+    background-color: var(--primary-button-background);
+    color: var(--primary-button-text);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+#downloadCanvasBtn:hover {
+    background-color: var(--primary-button-hover-background);
+    box-shadow: 0 4px 8px var(--shadow-color); /* Adjusted shadow for hover */
+}
+
+#downloadCanvasBtn:active {
+    background-color: var(--primary-button-active-background);
+}
+
+/* Commented out original canvas-specific styles as P5 now controls canvas directly */
+/*
+canvas {
+    /* display: block; was here, now part of reset */
+/*}
+*/
+
+/* Commented out original conflicting body style */
+/*
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    background-color: #f0f0f0; // This was an older style
+}
+*/
+
+@media (max-width: 768px) {
+    #main-content-area {
+        flex-direction: column;
+    }
+    #simulation-panel {
+        flex-grow: 0; /* Do not grow beyond basis in a column */
+        flex-basis: 60vh; /* Define height as 60% of viewport height */
+        width: 100%;    /* Take full width in column layout */
+        height: auto;   /* Reset desktop height, flex-basis controls main axis (height) */
+    }
+    #info-panel {
+        flex-grow: 1; /* Take remaining vertical space */
+        flex-basis: auto; /* Reset desktop basis, grow will handle height */
+        width: 100%;    /* Take full width in column layout */
+        height: auto;   /* Reset desktop height */
+        border-left: none; /* Remove left border from desktop */
+        border-top: 1px solid var(--card-border-color); /* Add top border */
+        box-shadow: 0 -2px 5px var(--shadow-color); /* Shadow on top */
+        border-radius: 8px 8px 0 0; /* Rounded top corners */
+    }
+    /* Other mobile styles will follow */
+}
