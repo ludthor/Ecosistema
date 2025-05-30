@@ -15,6 +15,88 @@ function getCSSVariable(varName) {
     return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
 }
 
+const infoPanelPlaceholderHtml = `<p class="info-panel-placeholder">Click on a creature in the simulation to see its details here.</p>`;
+let infoPanelElement = null; // To cache the info panel DOM element
+
+function updateInfoPanel(htmlContent) {
+    if (!infoPanelElement) {
+        infoPanelElement = document.getElementById('info-panel');
+    }
+    if (infoPanelElement) {
+        infoPanelElement.innerHTML = htmlContent;
+    } else {
+        console.error("#info-panel not found.");
+    }
+}
+
+function displayCreatureInfo(creature) {
+    if (!creature) {
+        updateInfoPanel(infoPanelPlaceholderHtml);
+        return;
+    }
+
+    // --- Data Handling & Defaults ---
+    const typeDisplay = creature.type || "Unknown";
+    const idPrefix = creature.id ? creature.id.substring(0, 4) : "N/A";
+    const nameDisplay = creature.name || `${typeDisplay} #${idPrefix}`;
+    
+    let iconClass = '';
+    let iconText = typeDisplay.charAt(0).toUpperCase();
+    switch (typeDisplay.toLowerCase()) {
+        case 'plant':
+            iconClass = 'plant'; // CSS uses .creature-icon-placeholder.plant, not just .plant
+            iconText = 'P';
+            break;
+        case 'herbivore':
+            iconClass = 'herbivore';
+            iconText = 'H';
+            break;
+        case 'carnivore':
+            iconClass = 'carnivore';
+            iconClass = 'carnivore';
+            iconText = 'C';
+            break;
+        // default: iconClass remains '', iconText is first letter.
+    }
+    // The creature-icon-placeholder class has a default background (plant).
+    // Specific classes like 'herbivore', 'carnivore' override this.
+    // If iconClass is '', it will use the default.
+
+    const ageDisplay = creature.age !== undefined ? `${creature.age} cycles` : "N/A";
+    
+    let energyDisplay = "N/A";
+    if (creature.energy !== undefined) {
+        if (creature.maxEnergy !== undefined) {
+            energyDisplay = `${creature.energy} / ${creature.maxEnergy}`;
+        } else {
+            energyDisplay = `${creature.energy}`;
+        }
+    }
+    // Plants might not have energy in the same way, or it's managed differently.
+    if (typeDisplay.toLowerCase() === 'plant') {
+        energyDisplay = "N/A (Rooted)";
+    }
+
+    const statusDisplay = creature.status || (typeDisplay.toLowerCase() === 'plant' ? "Growing" : "Idle");
+
+    // --- HTML Generation ---
+    const htmlContent = `
+        <div class="creature-details-card">
+            <div class="creature-icon-placeholder ${iconClass}">${iconText}</div>
+            <div class="creature-info">
+                <h4 class="creature-name">${nameDisplay}</h4>
+                <p class="creature-attribute">Species: <span class="creature-species">${typeDisplay}</span></p>
+                <p class="creature-attribute">ID: <span class="creature-id">${creature.id || "N/A"}</span></p>
+                <p class="creature-attribute">Age: <span class="creature-age">${ageDisplay}</span></p>
+                <p class="creature-attribute">Energy: <span class="creature-energy">${energyDisplay}</span></p>
+                <p class="creature-attribute">Status: <span class="creature-status">${statusDisplay}</span></p>
+                <p class="creature-attribute">Position: <span class="creature-pos">X: ${creature.x.toFixed(0)}, Y: ${creature.y.toFixed(0)}</span></p>
+            </div>
+        </div>
+    `;
+    updateInfoPanel(htmlContent);
+}
+
 // --- P5.js Structure ---
 
 function setup() {
@@ -81,6 +163,34 @@ function draw() {
     }
     
     // console.log('P5.js draw() loop running'); // Can be very noisy
+}
+
+function mousePressed() {
+    if (!creaturesCache || creaturesCache.length === 0) {
+        return;
+    }
+
+    let creatureClicked = null;
+    // Iterate backwards to select the topmost creature if they overlap
+    for (let i = creaturesCache.length - 1; i >= 0; i--) {
+        const creature = creaturesCache[i];
+        // Using dist() from P5.js for click detection within circular bounds
+        // Make sure mouseX and mouseY are defined (i.e., click is within canvas)
+        if (typeof mouseX !== 'undefined' && typeof mouseY !== 'undefined') {
+            let d = dist(mouseX, mouseY, creature.x, creature.y);
+            if (d < creature.size / 2) {
+                creatureClicked = creature;
+                break; 
+            }
+        }
+    }
+
+    if (creatureClicked) {
+        displayCreatureInfo(creatureClicked);
+    } else {
+        // Clicked on empty space
+        updateInfoPanel(infoPanelPlaceholderHtml);
+    }
 }
 
 // --- End P5.js Structure ---
@@ -215,6 +325,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     const body = document.body;
     const currentThemeKey = 'themePreference';
+    
+    infoPanelElement = document.getElementById('info-panel'); // Cache info panel element
+    updateInfoPanel(infoPanelPlaceholderHtml); // Set initial placeholder message
 
     // Function to apply theme and update button
     const applyTheme = (theme) => {
