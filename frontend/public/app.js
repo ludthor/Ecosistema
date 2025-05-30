@@ -99,11 +99,48 @@ function displayCreatureInfo(creature) {
 
 // --- P5.js Structure ---
 
+let canvasParentRef = null; // To cache #canvas-parent element
+
+function resizeP5Canvas() {
+    if (!canvasParentRef) {
+        canvasParentRef = document.getElementById('canvas-parent');
+    }
+    if (canvasParentRef) {
+        // Ensure canvas parent has non-zero dimensions before resizing.
+        // This can be an issue if CSS isn't fully applied or element is hidden.
+        if (canvasParentRef.offsetWidth > 0 && canvasParentRef.offsetHeight > 0) {
+            resizeCanvas(canvasParentRef.offsetWidth, canvasParentRef.offsetHeight);
+            console.log("P5.js canvas resized to parent:", canvasParentRef.offsetWidth, "x", canvasParentRef.offsetHeight);
+        } else {
+            console.warn("#canvas-parent has zero dimensions. Canvas not resized. CSS ensure it's visible and has size.");
+        }
+    } else {
+        console.warn("#canvas-parent not found for resizing P5 canvas.");
+    }
+}
+
 function setup() {
     p5CanvasBackgroundColor = color(getCSSVariable('--background-color')); // Initialize with theme color
-    let cnv = createCanvas(windowWidth, windowHeight); // Use P5.js windowWidth and windowHeight
-    cnv.parent('canvas-parent'); // Tell P5 to put canvas in this div
-    console.log("P5.js setup complete. Canvas created in #canvas-parent at window dimensions:", windowWidth, "x", windowHeight);
+    
+    canvasParentRef = document.getElementById('canvas-parent');
+    if (!canvasParentRef) {
+        console.error("CRITICAL: #canvas-parent div not found. P5.js canvas cannot be created.");
+        // Fallback or error state if #canvas-parent is missing
+        let cnv = createCanvas(100, 100); // Create a tiny fallback canvas
+        cnv.parent(document.body); // Attach it somewhere to avoid breaking P5 flow
+        return; // Stop further setup for canvas
+    }
+
+    const parentWidth = canvasParentRef.offsetWidth;
+    const parentHeight = canvasParentRef.offsetHeight;
+
+    if (parentWidth === 0 || parentHeight === 0) {
+        console.warn("Warning: #canvas-parent has zero dimensions during setup. Canvas might not be visible. Check CSS.");
+    }
+
+    let cnv = createCanvas(parentWidth, parentHeight);
+    cnv.parent(canvasParentRef); // Use the cached reference
+    console.log("P5.js setup complete. Canvas created in #canvas-parent with dimensions:", parentWidth, "x", parentHeight);
     
     // Initial fetch of creatures
     fetchCreatures().then(data => {
@@ -129,13 +166,29 @@ function setup() {
     }, 500); // Refresh every 500ms
     
     console.log('P5.js: setup() finished.');
+
+    // Setup ResizeObserver if available
+    if (typeof ResizeObserver !== 'undefined') {
+        const resizeObserver = new ResizeObserver(entries => {
+            // We are observing only one element.
+            // A brief delay can sometimes help if the resize is rapid or involves CSS transitions.
+            // requestAnimationFrame is a good way to sync with browser's repaint cycle.
+            requestAnimationFrame(() => {
+                console.log('ResizeObserver detected #canvas-parent resize.');
+                resizeP5Canvas();
+            });
+        });
+        resizeObserver.observe(canvasParentRef); // Observe the cached element
+    } else {
+        console.warn('ResizeObserver not supported. Canvas resize will only occur on window resize.');
+    }
 }
 
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-    console.log("P5.js canvas resized to:", windowWidth, windowHeight);
-    // Optional: Redraw static elements or re-center view if needed after resize
-    // The main draw() loop will continue to render content.
+    // This is still useful as a fallback or for initial sizing on some browsers,
+    // and when ResizeObserver is not available.
+    console.log("windowResized event triggered.");
+    resizeP5Canvas();
 }
 
 function draw() {
