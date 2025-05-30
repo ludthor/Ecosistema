@@ -37,7 +37,7 @@ function displayCreatureInfo(creature) {
 
     // --- Data Handling & Defaults ---
     const typeDisplay = creature.type || "Unknown";
-    const idPrefix = creature.id ? creature.id.substring(0, 4) : "N/A";
+    const idPrefix = creature.id ? String(creature.id).substring(0, 4) : "N/A";
     const nameDisplay = creature.name || `${typeDisplay} #${idPrefix}`;
     
     let iconClass = '';
