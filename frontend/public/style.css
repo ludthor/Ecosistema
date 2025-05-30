@@ -295,3 +295,26 @@ body {
     background-color: #f0f0f0; // This was an older style
 }
 */
+
+@media (max-width: 768px) {
+    #main-content-area {
+        flex-direction: column;
+    }
+    #simulation-panel {
+        flex-grow: 0; /* Do not grow beyond basis in a column */
+        flex-basis: 60vh; /* Define height as 60% of viewport height */
+        width: 100%;    /* Take full width in column layout */
+        height: auto;   /* Reset desktop height, flex-basis controls main axis (height) */
+    }
+    #info-panel {
+        flex-grow: 1; /* Take remaining vertical space */
+        flex-basis: auto; /* Reset desktop basis, grow will handle height */
+        width: 100%;    /* Take full width in column layout */
+        height: auto;   /* Reset desktop height */
+        border-left: none; /* Remove left border from desktop */
+        border-top: 1px solid var(--card-border-color); /* Add top border */
+        box-shadow: 0 -2px 5px var(--shadow-color); /* Shadow on top */
+        border-radius: 8px 8px 0 0; /* Rounded top corners */
+    }
+    /* Other mobile styles will follow */
+}
