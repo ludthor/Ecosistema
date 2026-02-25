@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Frontend dependencies
+frontend/node_modules/
+
+# Java/Gradle generated files
+ecosystem-app/.gradle/
+ecosystem-app/build/
+ecosystem-app/bin/
+
+# Eclipse/IDE metadata
+ecosystem-app/.classpath
+ecosystem-app/.project
+ecosystem-app/.settings/
