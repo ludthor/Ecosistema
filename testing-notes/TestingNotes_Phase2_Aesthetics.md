@@ -23,10 +23,10 @@ This document guides you through a holistic test of the "Phase 2" aesthetic mode
 
 ## II. Test Execution:
 
-Navigate to the frontend URL (typically `http://localhost:8081`) and perform the following checks, referencing details from `TestingNotes_P5Background.md` and `TestingNotes_P5CreatureAesthetics.md` where helpful.
+Navigate to the frontend URL (typically `http://localhost:8081`) and perform the following checks, referencing details from [TestingNotes_P5Background.md](TestingNotes_P5Background.md) and [TestingNotes_P5CreatureAesthetics.md](TestingNotes_P5CreatureAesthetics.md) where helpful.
 
 ### A. Canvas Background Aesthetics
-*(Referencing `TestingNotes_P5Background.md`)*
+*(Referencing [TestingNotes_P5Background.md](TestingNotes_P5Background.md))*
 
 1.  **Primary Background (Solid Color):**
     *   [ ] Does the P5.js canvas background display the new solid, light, cool off-white color (RGB: 245, 248, 250)?
@@ -37,7 +37,7 @@ Navigate to the frontend URL (typically `http://localhost:8081`) and perform the
         *   Does it fill the entire canvas?
 
 ### B. Creature Aesthetics
-*(Referencing `TestingNotes_P5CreatureAesthetics.md`)*
+*(Referencing [TestingNotes_P5CreatureAesthetics.md](TestingNotes_P5CreatureAesthetics.md))*
 
 1.  **Plant Aesthetics:**
     *   [ ] Are Plants rendered as **medium green rectangles with slightly rounded corners**?

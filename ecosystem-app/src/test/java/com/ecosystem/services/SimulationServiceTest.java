@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class SimulationServiceTest {
@@ -128,27 +129,19 @@ public class SimulationServiceTest {
 
     @Test
     void solveEncounters_plantHerbivoreInteraction() {
-        // Clear existing creatures and set up a specific scenario
-        simulationService.getCreatures().clear(); // Clear creatures from SimulationService list
         // Manually create and add one plant and one herbivore very close to each other
-        Plant testPlant = new Plant(10, 10, 10, true, 500);
+        Plant testPlant = new Plant(10, 10, 10, true, 500, worldWidth, worldHeight);
         Herbivore testHerbivore = new Herbivore("TestEater", 11, 11, 1, 12, true, com.ecosystem.model.enums.Gender.MALE, 0.1f, 1000, 0.05f, 1, 25);
         testHerbivore.setEnergy(30); // Make herbivore hungry
+        testHerbivore.setX(10);
+        testHerbivore.setY(10);
+        testHerbivore.setSpeed(0f);
+        testHerbivore.setDirVariation(0f);
 
-        // Add to simulation service's list (which is now CopyOnWriteArrayList)
-        List<Creature> testList = new java.util.concurrent.CopyOnWriteArrayList<>();
-        testList.add(testPlant);
+        List<Creature> testList = new ArrayList<>();
         testList.add(testHerbivore);
-        
-        // Manually set the internal list of creatures in SimulationService for this test
-        // This is a bit of a hack, ideally we'd have a method in SimulationService to set creatures for testing
-        // For now, we'll rely on the fact that runSimulationStep uses this.creatures
-        // Need to reflect this change in the private field, which is tricky without a setter or reflection.
-        // So, instead, let's re-initialize and then filter/manipulate.
-        simulationService.initializeCreatures(); // Re-init to get a fresh list
-        simulationService.getCreatures().clear(); // Clear it again
-        simulationService.getCreatures().add(testPlant);
-        simulationService.getCreatures().add(testHerbivore);
+        testList.add(testPlant);
+        simulationService.setCreaturesForTesting(testList);
         
         float initialPlantHealth = testPlant.getHealth();
         float initialHerbivoreEnergy = testHerbivore.getEnergy();
@@ -161,13 +154,14 @@ public class SimulationServiceTest {
 
     @Test
     void solveEncounters_carnivoreHerbivoreInteraction() {
-        simulationService.getCreatures().clear();
         Carnivore testCarnivore = new Carnivore("Hunter", 10, 10, 1.5f, 15, true, com.ecosystem.model.enums.Gender.FEMALE, 0.1f, 1200, 0.05f, 1, 40);
         Herbivore testPrey = new Herbivore("Prey", 11, 11, 1, 12, true, com.ecosystem.model.enums.Gender.MALE, 0.1f, 1000, 0.05f, 1, 25);
         testCarnivore.setEnergy(30); // Make carnivore hungry
 
-        simulationService.getCreatures().add(testCarnivore);
-        simulationService.getCreatures().add(testPrey);
+        List<Creature> testList = new ArrayList<>();
+        testList.add(testCarnivore);
+        testList.add(testPrey);
+        simulationService.setCreaturesForTesting(testList);
 
         float initialPreyHealth = testPrey.getHealth();
         float initialCarnivoreEnergy = testCarnivore.getEnergy();
@@ -182,17 +176,18 @@ public class SimulationServiceTest {
     
     @Test
     void solveEncounters_reproductionInteraction() {
-        simulationService.getCreatures().clear();
         Herbivore herbivore1 = new Herbivore("H1", 10, 10, 1, 12, true, com.ecosystem.model.enums.Gender.MALE, 0.1f, 1000, 0.05f, 1, 25);
         Herbivore herbivore2 = new Herbivore("H2", 11, 11, 1, 12, true, com.ecosystem.model.enums.Gender.FEMALE, 0.1f, 1000, 0.05f, 1, 25);
         
         herbivore1.setEnergy(100); herbivore1.setMateTimer(0); herbivore1.setAge(500);
         herbivore2.setEnergy(100); herbivore2.setMateTimer(0); herbivore2.setAge(500);
 
-        simulationService.getCreatures().add(herbivore1);
-        simulationService.getCreatures().add(herbivore2);
+        List<Creature> testList = new ArrayList<>();
+        testList.add(herbivore1);
+        testList.add(herbivore2);
+        simulationService.setCreaturesForTesting(testList);
         
-        int initialCreatureCount = simulationService.getCreatures().size();
+        int initialCreatureCount = testList.size();
 
         simulationService.runSimulationStep(); // This step should trigger reproduction
 
@@ -205,5 +200,77 @@ public class SimulationServiceTest {
         // Verify mate timers are set
         assertTrue(herbivore1.getMateTimer() > 0, "Herbivore1 mate timer should be set.");
         assertTrue(herbivore2.getMateTimer() > 0, "Herbivore2 mate timer should be set.");
+    }
+
+    @Test
+    void resetSimulation_sameSeed_producesSameInitialState() {
+        long seed = 123456789L;
+
+        simulationService.resetSimulation(seed);
+        List<String> first = snapshotCreatures(simulationService.getCreatures());
+
+        simulationService.resetSimulation(seed);
+        List<String> second = snapshotCreatures(simulationService.getCreatures());
+
+        assertEquals(first, second, "Initial state should be identical when reset with the same seed.");
+    }
+
+    @Test
+    void resetSimulation_sameSeed_producesSameOneStepState() {
+        long seed = 987654321L;
+
+        simulationService.resetSimulation(seed);
+        simulationService.runSimulationStep();
+        List<String> firstAfterStep = snapshotCreatures(simulationService.getCreatures());
+
+        simulationService.resetSimulation(seed);
+        simulationService.runSimulationStep();
+        List<String> secondAfterStep = snapshotCreatures(simulationService.getCreatures());
+
+        assertEquals(firstAfterStep, secondAfterStep, "One-step state should be identical when replayed with the same seed.");
+    }
+
+    @Test
+    void runSimulationStep_incrementsStepCount() {
+        long initialStep = simulationService.getSimulationStepCount();
+
+        simulationService.runSimulationStep();
+        simulationService.runSimulationStep();
+
+        assertEquals(initialStep + 2, simulationService.getSimulationStepCount(), "Simulation step counter should increment per run.");
+    }
+
+    @Test
+    void resetSimulation_resetsStepCountAndUpdatesSeed() {
+        simulationService.resetSimulation(42L);
+        simulationService.runSimulationStep();
+        assertTrue(simulationService.getSimulationStepCount() > 0, "Step count should increase after running a step.");
+
+        simulationService.resetSimulation(7L);
+        assertEquals(0, simulationService.getSimulationStepCount(), "Step count should reset to zero after reset.");
+        assertEquals(7L, simulationService.getSimulationSeed(), "Simulation seed should reflect the latest reset seed.");
+    }
+
+    private List<String> snapshotCreatures(List<Creature> creatures) {
+        return creatures.stream().map(c -> String.format(
+                "%s|%s|%s|%s|%.6f|%.6f|%.6f|%.6f|%.6f|%.6f|%.6f|%d|%d|%.6f|%d|%.6f|%b",
+                c.getType(),
+                c.getName(),
+                c.getGender(),
+                c.getColor(),
+                c.getX(),
+                c.getY(),
+                c.getDirection(),
+                c.getEnergy(),
+                c.getHealth(),
+                c.getSpeed(),
+                c.getDirVariation(),
+                c.getSize(),
+                c.getMaxAge(),
+                c.getMutationRate(),
+                c.getMaxOffspring(),
+                c.getOffspringEnergy(),
+                c.isAlive()
+        )).collect(Collectors.toList());
     }
 }

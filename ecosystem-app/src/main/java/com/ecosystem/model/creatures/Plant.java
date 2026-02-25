@@ -16,6 +16,7 @@ public class Plant extends Creature {
         super(EcoUtils.nameGenerator(), x, y, 0, size, toroidal, Gender.NEUTRAL, 0, maxAge, 0.01f, 0, 0, effectiveWorldWidth, effectiveWorldHeight);
         setEnergy(100); // Plants start with some energy
         setHealth(50); // Plants have health
+        setStatus("Growing");
         // Color is set in super constructor
     }
 
@@ -24,6 +25,7 @@ public class Plant extends Creature {
         super(EcoUtils.nameGenerator(), effectiveWorldWidth, effectiveWorldHeight, 0, size, toroidal, Gender.NEUTRAL, 0, maxAge, 0.01f, 0, 0);
         setEnergy(100);
         setHealth(50);
+        setStatus("Growing");
         // Color is set in super constructor
     }
     
@@ -33,7 +35,10 @@ public class Plant extends Creature {
         // For now, do nothing.
         // They still age and lose a tiny bit of energy
         setAge(getAge() + 1);
-        setEnergy(getEnergy() - 0.01f); // Very slow energy decay or metabolic cost
+        // Photosynthesis: plants slowly regain energy (capped at 100)
+        float newEnergy = getEnergy() + 0.05f;
+        if (newEnergy > 100) newEnergy = 100;
+        setEnergy(newEnergy);
         if (getMateTimer() > 0) setMateTimer(getMateTimer() - 1); // Though plants might not use this
     }
 

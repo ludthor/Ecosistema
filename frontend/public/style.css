@@ -81,10 +81,50 @@ input, button, textarea, select {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 15px; /* Consistent padding */
+    gap: 12px;
+    padding: 10px 15px; /* Consistent padding */
     background-color: var(--background-color);
     border-bottom: 1px solid var(--card-border-color);
     flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+#app-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 250px;
+}
+
+#app-subtitle {
+    font-size: 0.8em;
+    opacity: 0.8;
+}
+
+#header-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+#simulation-metadata {
+    font-size: 0.9em;
+    color: var(--text-color);
+    opacity: 0.9;
+    white-space: nowrap;
+}
+
+#replay-status {
+    font-size: 0.85em;
+    opacity: 0.9;
+}
+
+#replay-status.replay-pass {
+    font-weight: 600;
+}
+
+#replay-status.replay-fail {
+    font-weight: 600;
 }
 
 #main-content-area {
@@ -139,6 +179,8 @@ input, button, textarea, select {
     display: flex; /* To center canvas if it's smaller than parent */
     justify-content: center; /* Center canvas horizontally */
     align-items: center; /* Center canvas vertically */
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 /* Ensure P5 canvas itself adheres to the parent size */
@@ -160,6 +202,137 @@ input, button, textarea, select {
     box-shadow: -2px 0 5px var(--shadow-color); /* Shadow on left edge */
     color: var(--card-text-color);
     border-radius: 8px 0 0 8px; /* Rounded corners on left */
+}
+
+.overview-card {
+    background-color: var(--background-color);
+    border: 1px solid var(--card-border-color);
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 1px 4px var(--shadow-color);
+}
+
+.overview-title {
+    font-size: 1.1em;
+    margin-bottom: 12px;
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.overview-stat {
+    border: 1px solid var(--card-border-color);
+    border-radius: 8px;
+    padding: 8px;
+    background-color: var(--card-background-color);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.overview-label {
+    font-size: 0.8em;
+    opacity: 0.8;
+}
+
+.overview-value {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.overview-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.timeline-card {
+    border: 1px solid var(--card-border-color);
+    border-radius: 8px;
+    background-color: var(--card-background-color);
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.timeline-title {
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.timeline-range {
+    font-size: 0.78em;
+    opacity: 0.8;
+}
+
+.trend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.trend-row:last-child {
+    margin-bottom: 0;
+}
+
+.trend-label {
+    width: 68px;
+    font-size: 0.78em;
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.sparkline {
+    width: 100%;
+    height: 32px;
+    display: block;
+}
+
+.sparkline-line {
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.sparkline.total .sparkline-line {
+    stroke: var(--text-color);
+}
+
+.sparkline.plants .sparkline-line {
+    stroke: var(--plant-icon-color);
+}
+
+.sparkline.herbivores .sparkline-line {
+    stroke: var(--herbivore-icon-color);
+}
+
+.sparkline.carnivores .sparkline-line {
+    stroke: var(--carnivore-icon-color);
+}
+
+.sparkline-empty {
+    font-size: 0.75em;
+    opacity: 0.75;
+}
+
+.overview-hint {
+    font-size: 0.85em;
+    opacity: 0.85;
 }
 
 /* This rule is redundant as #app-container h1 is styled earlier as a static block.
@@ -236,12 +409,116 @@ input, button, textarea, select {
     font-weight: normal; /* Ensure value part is not bold if label part is made bold later */
 }
 
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.82em;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.status-seeking-food,
+.status-foraging {
+    background: rgba(103, 204, 123, 0.18);
+    border-color: rgba(103, 204, 123, 0.5);
+}
+
+.status-evading {
+    background: rgba(245, 193, 78, 0.2);
+    border-color: rgba(245, 193, 78, 0.56);
+}
+
+.status-pursuing,
+.status-feeding {
+    background: rgba(233, 95, 95, 0.2);
+    border-color: rgba(233, 95, 95, 0.56);
+}
+
+.status-mate-seeking {
+    background: rgba(186, 121, 255, 0.2);
+    border-color: rgba(186, 121, 255, 0.56);
+}
+
+.status-growing,
+.status-roaming,
+.status-neutral {
+    background: rgba(145, 171, 205, 0.18);
+    border-color: rgba(145, 171, 205, 0.5);
+}
+
+.behavior-legend {
+    margin-bottom: 10px;
+    border: 1px dashed var(--card-border-color);
+    border-radius: 8px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.behavior-legend-title {
+    font-size: 0.82em;
+    margin-bottom: 8px;
+    opacity: 0.9;
+}
+
+.behavior-legend-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
+}
+
+.legend-item {
+    font-size: 0.8em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    display: inline-block;
+}
+
+.behavior-legend-disabled {
+    margin-bottom: 10px;
+    font-size: 0.82em;
+    opacity: 0.85;
+}
+
+.legend-dot.status-seeking-food,
+.legend-dot.status-foraging {
+    background: rgba(103, 204, 123, 0.9);
+}
+
+.legend-dot.status-evading {
+    background: rgba(245, 193, 78, 0.9);
+}
+
+.legend-dot.status-pursuing,
+.legend-dot.status-feeding {
+    background: rgba(233, 95, 95, 0.9);
+}
+
+.legend-dot.status-mate-seeking {
+    background: rgba(186, 121, 255, 0.9);
+}
+
+.legend-dot.status-growing,
+.legend-dot.status-roaming,
+.legend-dot.status-neutral {
+    background: rgba(145, 171, 205, 0.9);
+}
+
 #ui-controls { 
     /* padding: 10px; No longer needed, header has padding */
     display: flex;
     /* justify-content: center; No longer needed, header uses space-between */
     align-items: center;
     gap: 10px; /* Space between buttons is good */
+    flex-wrap: wrap;
     /* background-color: var(--background-color); No longer needed */
     /* border-top: 1px solid var(--card-border-color); No longer needed */
 }
@@ -254,6 +531,21 @@ input, button, textarea, select {
     /* cursor: pointer; Already set on #downloadCanvasBtn */
     /* box-shadow: 0 2px 4px var(--shadow-color); Already set on #downloadCanvasBtn */
     /* transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; Already set */
+}
+
+#seedInput {
+    border: 1px solid var(--card-border-color);
+    background-color: var(--card-background-color);
+    color: var(--text-color);
+    border-radius: 5px;
+    padding: 6px 10px;
+    font-size: 0.85em;
+    width: 140px;
+}
+
+#seedInput::placeholder {
+    color: var(--text-color);
+    opacity: 0.7;
 }
 
 #downloadCanvasBtn {
@@ -277,6 +569,70 @@ input, button, textarea, select {
     background-color: var(--primary-button-active-background);
 }
 
+#downloadCanvasBtn,
+#themeToggleBtn,
+#resetWithSeedBtn,
+#resetRandomBtn {
+    background-color: var(--primary-button-background);
+    color: var(--primary-button-text);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+#downloadCanvasBtn:hover,
+#themeToggleBtn:hover,
+#resetWithSeedBtn:hover,
+#resetRandomBtn:hover {
+    background-color: var(--primary-button-hover-background);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+#downloadCanvasBtn:active,
+#themeToggleBtn:active,
+#resetWithSeedBtn:active,
+#resetRandomBtn:active {
+    background-color: var(--primary-button-active-background);
+}
+
+#downloadCanvasBtn:disabled,
+#themeToggleBtn:disabled,
+#resetWithSeedBtn:disabled,
+#resetRandomBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+#replayCheckBtn {
+    background-color: var(--primary-button-background);
+    color: var(--primary-button-text);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+#replayCheckBtn:hover {
+    background-color: var(--primary-button-hover-background);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+#replayCheckBtn:active {
+    background-color: var(--primary-button-active-background);
+}
+
+#replayCheckBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
 /* Commented out original canvas-specific styles as P5 now controls canvas directly */
 /*
 canvas {
@@ -297,6 +653,25 @@ body {
 */
 
 @media (max-width: 768px) {
+    #app-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    #app-brand {
+        width: 100%;
+    }
+
+    #header-status {
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    #simulation-metadata {
+        order: 3;
+        width: 100%;
+    }
+
     #main-content-area {
         flex-direction: column;
     }
@@ -306,6 +681,42 @@ body {
         width: 100%;    /* Take full width in column layout */
         height: auto;   /* Reset desktop height, flex-basis controls main axis (height) */
     }
+
+    #seedInput {
+        width: 100%;
+    }
+
+    #ui-controls {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    #ui-controls button {
+        flex: 1 1 auto;
+    }
+
+    .behavior-legend-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .overview-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .timeline-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .trend-label {
+        width: 62px;
+    }
+
     #info-panel {
         flex-grow: 1; /* Take remaining vertical space */
         flex-basis: auto; /* Reset desktop basis, grow will handle height */

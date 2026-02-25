@@ -6,15 +6,12 @@ import com.ecosystem.model.creatures.Herbivore;
 import com.ecosystem.model.creatures.Carnivore;
 import com.ecosystem.model.environment.Territory;
 import com.ecosystem.model.environment.TPlace;
-import com.ecosystem.model.enums.Gender;
-import com.ecosystem.utils.EcoUtils;
+import com.ecosystem.utils.SimulationRandom;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Iterator;
-import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
@@ -32,8 +29,7 @@ public class SimulationService {
     private final int territoryGridWidth = 10; // Example: 10x10 grid for TPlaces
     private final int territoryGridHeight = 10;
     private final int placeSize; // Size of each TPlace in pixels
-
-    private static Random random = new Random();
+    private long simulationStepCount = 0;
 
     // Default constructor for Spring, world size can be configured via properties or setters if needed
     public SimulationService() {
@@ -59,8 +55,9 @@ public class SimulationService {
         initializeCreatures();
     }
 
-    private void initializeCreatures() {
+    void initializeCreatures() {
         creatures.clear(); // Clear any existing creatures
+        var random = SimulationRandom.current();
 
         // Initialize Plants
         for (int i = 0; i < numPlants; i++) {
@@ -111,8 +108,20 @@ public class SimulationService {
         }
     }
 
+    void setCreaturesForTesting(List<Creature> testCreatures) {
+        this.creatures = new CopyOnWriteArrayList<>(testCreatures);
+        for (Creature c : territory.getAllCreatures()) {
+            territory.removeCreature(c);
+        }
+        for (Creature creature : this.creatures) {
+            if (creature.isAlive()) {
+                territory.addCreature(creature);
+            }
+        }
+    }
+
     @Scheduled(fixedRate = 100) // Approx 10 FPS
-    public void runSimulationStep() {
+    public synchronized void runSimulationStep() {
         // Create a temporary list from the thread-safe CopyOnWriteArrayList for safe iteration and modification
         List<Creature> currentCreaturesSnapshot = new ArrayList<>(this.creatures);
         List<Creature> nextStepCreatures = new ArrayList<>(); // To build the list for the next state
@@ -182,6 +191,82 @@ public class SimulationService {
         
         // 5. Update the main creatures list (CopyOnWriteArrayList)
         this.creatures = new CopyOnWriteArrayList<>(nextStepCreatures);
+
+        // 6. Respawn logic: replenish creatures if populations drop too low
+        respawnIfNeeded();
+        simulationStepCount++;
+    }
+
+    private void respawnIfNeeded() {
+        var random = SimulationRandom.current();
+        long plantCount = this.creatures.stream().filter(c -> c instanceof Plant && c.isAlive()).count();
+        long herbivoreCount = this.creatures.stream().filter(c -> c instanceof Herbivore && c.isAlive()).count();
+        long carnivoreCount = this.creatures.stream().filter(c -> c instanceof Carnivore && c.isAlive()).count();
+
+        List<Creature> spawned = new ArrayList<>();
+
+        // Keep minimum population thresholds
+        int minPlants = numPlants / 2;       // At least half the initial count
+        int minHerbivores = numHerbivores / 3;
+        int minCarnivores = numCarnivores / 3;
+
+        while (plantCount < minPlants) {
+            Plant p = new Plant(effectiveSimWidth, effectiveSimHeight,
+                    10 + random.nextInt(5), true, 600 + random.nextInt(401));
+            territory.addCreature(p);
+            spawned.add(p);
+            plantCount++;
+        }
+
+        while (herbivoreCount < minHerbivores) {
+            Herbivore h = new Herbivore(effectiveSimWidth, effectiveSimHeight,
+                    0.5f + random.nextFloat(), 12 + random.nextInt(7), true,
+                    (float) Math.toRadians(20 + random.nextInt(21)),
+                    900 + random.nextInt(301),
+                    0.02f + random.nextFloat() * 0.08f,
+                    1 + random.nextInt(2),
+                    25 + random.nextFloat() * 25);
+            territory.addCreature(h);
+            spawned.add(h);
+            herbivoreCount++;
+        }
+
+        while (carnivoreCount < minCarnivores) {
+            Carnivore c = new Carnivore(effectiveSimWidth, effectiveSimHeight,
+                    0.8f + random.nextFloat(), 15 + random.nextInt(9), true,
+                    (float) Math.toRadians(15 + random.nextInt(16)),
+                    1000 + random.nextInt(501),
+                    0.03f + random.nextFloat() * 0.07f,
+                    1 + random.nextInt(2),
+                    30 + random.nextFloat() * 30);
+            territory.addCreature(c);
+            spawned.add(c);
+            carnivoreCount++;
+        }
+
+        if (!spawned.isEmpty()) {
+            this.creatures.addAll(spawned);
+        }
+    }
+
+    public synchronized void resetSimulation(Long seed) {
+        if (seed == null) {
+            SimulationRandom.reset();
+        } else {
+            SimulationRandom.reseed(seed);
+        }
+
+        this.territory = new Territory(territoryGridWidth, territoryGridHeight, placeSize);
+        initializeCreatures();
+        this.simulationStepCount = 0;
+    }
+
+    public Long getSimulationSeed() {
+        return SimulationRandom.getCurrentSeed();
+    }
+
+    public synchronized long getSimulationStepCount() {
+        return simulationStepCount;
     }
 
     // Getter for creatures, primarily for observation or external use (e.g., API)

@@ -11,8 +11,19 @@
 <body>
     <main id="app-container">
         <header id="app-header">
-            <h1>Ecosystem Simulator</h1>
+            <div id="app-brand">
+                <h1>Ecosystem Simulator</h1>
+                <p id="app-subtitle">Deterministic ecosystem runs with live metadata tracking</p>
+            </div>
+            <div id="header-status">
+                <div id="simulation-metadata" aria-live="polite">Seed: — | Step: —</div>
+                <div id="replay-status" aria-live="polite">Replay Check: —</div>
+            </div>
             <div id="ui-controls"> 
+                <input id="seedInput" type="number" placeholder="Seed (optional)" aria-label="Simulation seed">
+                <button id="resetWithSeedBtn">Reset</button>
+                <button id="resetRandomBtn">Random Reset</button>
+                <button id="replayCheckBtn">Replay Check</button>
                 <button id="downloadCanvasBtn">Download Canvas</button>
                 <button id="themeToggleBtn">Toggle Theme</button>
             </div>
@@ -27,7 +38,7 @@
             </div>
 
             <div id="info-panel">
-                <p class="info-panel-placeholder">Click on a creature in the simulation to see its details here.</p>
+                <p class="info-panel-placeholder">Loading simulation overview...</p>
             </div>
         </div>
     </main>

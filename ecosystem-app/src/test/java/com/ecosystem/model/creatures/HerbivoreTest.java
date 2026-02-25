@@ -17,7 +17,7 @@ public class HerbivoreTest {
     @BeforeEach
     void setUp() {
         herbivore = new Herbivore("TestHerbivore", 50, 50, 1, 12, true, Gender.FEMALE, 0.1f, 1000, 0.05f, 1, 25);
-        plant = new Plant(51, 51, 10, true, 500); // Plant close to herbivore
+        plant = new Plant(51, 51, 10, true, 500, worldWidth, worldHeight); // Plant close to herbivore
     }
 
     @Test

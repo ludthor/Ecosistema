@@ -2,7 +2,7 @@
 
 This document outlines the steps to test `frontend/public/app.js` after data fetching has been integrated with the P5.js structure and the `drawP5Creature()` function is called within the P5.js `draw()` loop.
 
-**Assumption:** Testing of the basic P5.js setup (Subtask #20 - `TestingNotes_P5Setup.md`) confirmed that the P5.js canvas was created and its basic `draw()` loop was functional (e.g., rendering fixed art).
+**Assumption:** Testing of the basic P5.js setup (Subtask #20 - [TestingNotes_P5Setup.md](TestingNotes_P5Setup.md)) confirmed that the P5.js canvas was created and its basic `draw()` loop was functional (e.g., rendering fixed art).
 
 ## Prerequisites:
 

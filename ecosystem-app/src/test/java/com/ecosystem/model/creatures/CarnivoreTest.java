@@ -19,7 +19,7 @@ public class CarnivoreTest {
     void setUp() {
         carnivore = new Carnivore("TestCarnivore", 50, 50, 1.5f, 15, true, Gender.MALE, 0.1f, 1200, 0.05f, 1, 40);
         herbivore = new Herbivore("TestHerbivore", 51, 51, 1, 12, true, Gender.FEMALE, 0.1f, 1000, 0.05f, 1, 25);
-        plant = new Plant(52, 52, 10, true, 500); // Plant, for testing ignore interaction
+        plant = new Plant(52, 52, 10, true, 500, worldWidth, worldHeight); // Plant, for testing ignore interaction
     }
 
     @Test

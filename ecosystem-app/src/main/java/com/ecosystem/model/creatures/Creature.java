@@ -2,10 +2,10 @@ package com.ecosystem.model.creatures;
 
 import com.ecosystem.model.enums.Gender;
 import com.ecosystem.utils.EcoUtils; // For name and gender generation
+import com.ecosystem.utils.SimulationRandom;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Creature {
@@ -23,6 +23,7 @@ public class Creature {
     private int size;
     private boolean toroidal; // World wraps around?
     private String color;
+    private String status;
 
     // Effective world dimensions for this creature's movement and positioning
     private float creatureEffectiveWorldWidth;
@@ -35,8 +36,6 @@ public class Creature {
     private int mateTimer; // Cooldown after mating
     private int maxOffspring;
     private float offspringEnergy; // Energy given to offspring
-
-    private static Random random = new Random();
 
     // Constructor for creating creatures with specific initial parameters
     public Creature(String name, float x, float y, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy, float effectiveWorldWidth, float effectiveWorldHeight) {
@@ -52,6 +51,7 @@ public class Creature {
         this.color = EcoUtils.generateHexColor();
         this.gender = gender;
         this.dirVariation = dirVariation;
+        this.status = "Roaming";
 
         this.health = 100; // Initial health
         this.energy = 100; // Initial energy
@@ -62,7 +62,7 @@ public class Creature {
         this.maxOffspring = maxOffspring;
         this.offspringEnergy = offspringEnergy;
 
-        this.direction = random.nextFloat() * 2 * (float) Math.PI; // Random initial direction
+        this.direction = SimulationRandom.current().nextFloat() * 2 * (float) Math.PI; // Random initial direction
         updateSpeedComponents();
     }
 
@@ -73,14 +73,15 @@ public class Creature {
         // Store the passed worldWidth and worldHeight as the effective dimensions for this creature
         this.creatureEffectiveWorldWidth = worldWidth;
         this.creatureEffectiveWorldHeight = worldHeight;
-        this.x = random.nextFloat() * this.creatureEffectiveWorldWidth;
-        this.y = random.nextFloat() * this.creatureEffectiveWorldHeight;
+        this.x = SimulationRandom.current().nextFloat() * this.creatureEffectiveWorldWidth;
+        this.y = SimulationRandom.current().nextFloat() * this.creatureEffectiveWorldHeight;
         this.speed = speed;
         this.size = size;
         this.toroidal = toroidal;
         this.color = EcoUtils.generateHexColor();
         this.gender = gender;
         this.dirVariation = dirVariation;
+        this.status = "Roaming";
 
         this.health = 100;
         this.energy = 100;
@@ -91,7 +92,7 @@ public class Creature {
         this.maxOffspring = maxOffspring;
         this.offspringEnergy = offspringEnergy;
         
-        this.direction = random.nextFloat() * 2 * (float) Math.PI;
+        this.direction = SimulationRandom.current().nextFloat() * 2 * (float) Math.PI;
         updateSpeedComponents();
     }
 
@@ -106,14 +107,14 @@ public class Creature {
 
         // Change direction slightly based on dirVariation
         // dirVariation could be an angle in radians e.g. Math.toRadians(15) for +/- 15 degrees
-        this.direction += (random.nextFloat() * 2 - 1) * this.dirVariation;
+        this.direction += (SimulationRandom.current().nextFloat() * 2 - 1) * this.dirVariation * 0.35f;
         updateSpeedComponents();
 
         this.x += this.dx;
         this.y += this.dy;
 
         // Energy cost for moving
-        this.energy -= 0.1f; // Example cost
+        this.energy -= Math.max(0.03f, this.speed * 0.05f); // Scaled movement cost
 
         if (toroidal) {
             if (this.x < 0) this.x += this.creatureEffectiveWorldWidth;
@@ -180,7 +181,7 @@ public class Creature {
 
     public List<Creature> reproduce(Creature partner, int worldWidth, int worldHeight) {
         List<Creature> offspringList = new ArrayList<>();
-        int numOffspring = 1 + random.nextInt(this.maxOffspring); // 1 to maxOffspring
+        int numOffspring = 1 + SimulationRandom.current().nextInt(this.maxOffspring); // 1 to maxOffspring
 
         for (int i = 0; i < numOffspring; i++) {
             if (this.energy < this.offspringEnergy || partner.getEnergy() < partner.offspringEnergy) {
@@ -195,34 +196,34 @@ public class Creature {
             
             // Inherit and mutate properties
             float childSpeed = (this.speed + partner.getSpeed()) / 2;
-            if (random.nextFloat() < this.mutationRate) childSpeed *= (0.8f + random.nextFloat() * 0.4f); // +/- 20%
+            if (SimulationRandom.current().nextFloat() < this.mutationRate) childSpeed *= (0.8f + SimulationRandom.current().nextFloat() * 0.4f); // +/- 20%
 
             int childSize = (this.size + partner.getSize()) / 2;
-            if (random.nextFloat() < this.mutationRate) childSize = Math.max(5, childSize + (random.nextInt(5) - 2));
+            if (SimulationRandom.current().nextFloat() < this.mutationRate) childSize = Math.max(5, childSize + (SimulationRandom.current().nextInt(5) - 2));
 
 
             float childDirVariation = (this.dirVariation + partner.getDirVariation()) / 2;
-             if (random.nextFloat() < this.mutationRate) childDirVariation *= (0.8f + random.nextFloat() * 0.4f);
+             if (SimulationRandom.current().nextFloat() < this.mutationRate) childDirVariation *= (0.8f + SimulationRandom.current().nextFloat() * 0.4f);
 
 
             int childMaxAge = (this.maxAge + partner.getMaxAge()) / 2;
-            if (random.nextFloat() < this.mutationRate) childMaxAge = Math.max(100, childMaxAge + (random.nextInt(200) - 100));
+            if (SimulationRandom.current().nextFloat() < this.mutationRate) childMaxAge = Math.max(100, childMaxAge + (SimulationRandom.current().nextInt(200) - 100));
 
 
             float childMutationRate = (this.mutationRate + partner.getMutationRate()) / 2;
-            if (random.nextFloat() < this.mutationRate) childMutationRate = Math.max(0.01f, childMutationRate * (0.8f + random.nextFloat() * 0.4f));
+            if (SimulationRandom.current().nextFloat() < this.mutationRate) childMutationRate = Math.max(0.01f, childMutationRate * (0.8f + SimulationRandom.current().nextFloat() * 0.4f));
             
             int childMaxOffspring = (this.maxOffspring + partner.getMaxOffspring()) / 2;
-             if (random.nextFloat() < this.mutationRate) childMaxOffspring = Math.max(1, childMaxOffspring + (random.nextInt(3)-1));
+             if (SimulationRandom.current().nextFloat() < this.mutationRate) childMaxOffspring = Math.max(1, childMaxOffspring + (SimulationRandom.current().nextInt(3)-1));
 
             float childOffspringEnergy = (this.offspringEnergy + partner.getOffspringEnergy()) / 2;
-            if (random.nextFloat() < this.mutationRate) childOffspringEnergy = Math.max(10, childOffspringEnergy * (0.8f + random.nextFloat() * 0.4f));
+            if (SimulationRandom.current().nextFloat() < this.mutationRate) childOffspringEnergy = Math.max(10, childOffspringEnergy * (0.8f + SimulationRandom.current().nextFloat() * 0.4f));
 
 
             Creature child = new Creature(
                 childName,
-                this.x + (random.nextFloat() * 20 - 10), // Spawn near parent, ensure it's clamped if needed or use effective dimensions for spawn logic too
-                this.y + (random.nextFloat() * 20 - 10), // Spawn near parent
+                this.x + (SimulationRandom.current().nextFloat() * 20 - 10), // Spawn near parent, ensure it's clamped if needed or use effective dimensions for spawn logic too
+                this.y + (SimulationRandom.current().nextFloat() * 20 - 10), // Spawn near parent
                 childSpeed,
                 childSize,
                 this.toroidal, // Inherit toroidal nature
@@ -411,6 +412,14 @@ public class Creature {
 
     public String getType() {
         return this.getClass().getSimpleName();
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override

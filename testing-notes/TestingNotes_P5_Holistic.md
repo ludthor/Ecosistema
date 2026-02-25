@@ -22,7 +22,7 @@ This document guides you through a holistic test of the Ecosystem Simulator's fr
 Navigate to the frontend URL (typically `http://localhost:8081`) and perform the following checks, referencing details from previous P5.js specific testing notes where necessary.
 
 ### A. P5.js Canvas Setup and Full-Screen Functionality
-*(Referencing checks from `TestingNotes_P5FullScreenCanvas.md` and `TestingNotes_P5CleanedCode.md`)*
+*(Referencing checks from [TestingNotes_P5FullScreenCanvas.md](TestingNotes_P5FullScreenCanvas.md) and [TestingNotes_P5CleanedCode.md](TestingNotes_P5CleanedCode.md))*
 
 1.  **Initial Canvas State:**
     *   [ ] On page load, does the P5.js canvas correctly occupy the *entire* browser window?
@@ -34,7 +34,7 @@ Navigate to the frontend URL (typically `http://localhost:8081`) and perform the
     *   [ ] **Console Log:** Is `"P5.js canvas resized to: <new_width> <new_height>"` logged each time the resize completes?
 
 ### B. P5.js Creature Rendering
-*(Referencing checks from `TestingNotes_P5CleanedCode.md` or `TestingNotes_P5CreatureDrawing.md`)*
+*(Referencing checks from [TestingNotes_P5CleanedCode.md](TestingNotes_P5CleanedCode.md) or [TestingNotes_P5CreatureDrawing.md](TestingNotes_P5CreatureDrawing.md))*
 
 1.  **Creature Visibility and Appearance:**
     *   [ ] Are creatures visible on the P5.js canvas?
@@ -50,7 +50,7 @@ Navigate to the frontend URL (typically `http://localhost:8081`) and perform the
     *   [ ] `drawP5Creature` (Optional): If the detailed log inside `drawP5Creature` is enabled, do parameters look correct? (Usually kept commented due to noise).
 
 ### C. P5.js Download Canvas Feature
-*(Referencing checks from `TestingNotes_P5DownloadCanvas.md`)*
+*(Referencing checks from [TestingNotes_P5DownloadCanvas.md](TestingNotes_P5DownloadCanvas.md))*
 
 1.  **Button Visibility:**
     *   [ ] Is the "Download Canvas" button visible (typically bottom-left)?

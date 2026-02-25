@@ -1,7 +1,6 @@
 package com.ecosystem.utils;
 
 import com.ecosystem.model.enums.Gender;
-import java.util.Random;
 
 public class EcoUtils {
 
@@ -30,9 +29,8 @@ public class EcoUtils {
             SYLLABLES_15, SYLLABLES_16, SYLLABLES_17, SYLLABLES_18
     };
 
-    private static Random random = new Random();
-
     public static String nameGenerator() {
+        var random = SimulationRandom.current();
         StringBuilder name = new StringBuilder();
         int numSyllables = 2 + random.nextInt(3); // Names will have 2 to 4 syllables
 
@@ -45,6 +43,7 @@ public class EcoUtils {
     }
 
     public static Gender binaryGender() {
+        var random = SimulationRandom.current();
         if (random.nextBoolean()) {
             return Gender.FEMALE;
         } else {
@@ -53,8 +52,7 @@ public class EcoUtils {
     }
 
     public static String generateHexColor() {
-        Random randomInstance = new Random(); // It's better to reuse the class-level 'random' if possible, or pass it
-        int nextInt = randomInstance.nextInt(0xffffff + 1);
+        int nextInt = SimulationRandom.current().nextInt(0xffffff + 1);
         return String.format("#%06x", nextInt);
     }
 }

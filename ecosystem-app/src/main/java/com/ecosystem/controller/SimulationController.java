@@ -4,6 +4,8 @@ import com.ecosystem.model.creatures.Creature;
 import com.ecosystem.services.SimulationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,6 +43,43 @@ public class SimulationController {
     @GetMapping("/creatures")
     public List<Creature> getAllCreatures() {
         return simulationService.getCreatures();
+    }
+
+    @GetMapping("/metadata")
+    public SimulationMetadata getSimulationMetadata() {
+        List<Creature> creatures = simulationService.getCreatures();
+        long plants = creatures.stream().filter(c -> c instanceof com.ecosystem.model.creatures.Plant && c.isAlive()).count();
+        long herbivores = creatures.stream().filter(c -> c instanceof com.ecosystem.model.creatures.Herbivore && c.isAlive()).count();
+        long carnivores = creatures.stream().filter(c -> c instanceof com.ecosystem.model.creatures.Carnivore && c.isAlive()).count();
+
+        return new SimulationMetadata(
+                simulationService.getSimulationSeed(),
+                simulationService.getSimulationStepCount(),
+                creatures.size(),
+                plants,
+                herbivores,
+            carnivores,
+            simulationService.getEffectiveSimWidth(),
+            simulationService.getEffectiveSimHeight()
+        );
+    }
+
+    @PostMapping("/reset")
+    public List<Creature> resetSimulation(@RequestParam(required = false) Long seed) {
+        simulationService.resetSimulation(seed);
+        return simulationService.getCreatures();
+    }
+
+    public record SimulationMetadata(
+            Long seed,
+            long step,
+            long totalCreatures,
+            long plants,
+            long herbivores,
+            long carnivores,
+            float effectiveSimWidth,
+            float effectiveSimHeight
+    ) {
     }
 
     // You could add more specific endpoints, e.g., to get a single creature by ID

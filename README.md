@@ -2,86 +2,114 @@
 
 ## Description
 
-A web-based application simulating a simple ecosystem with plants, herbivores, and carnivores. This project is a modern web application rewrite of an original Java Processing-based ecosystem simulation. It features a Spring Boot backend that runs the simulation logic and a JavaScript frontend for visualization.
+Ecosystem Simulator is a deterministic, web-based ecosystem simulation with a Java backend and a p5.js frontend. It models Plants, Herbivores, and Carnivores with lifecycle, interaction, and reproduction rules, and now includes reproducible seeded resets, behavior-state cues, and improved visual motion/rendering.
 
-## Technologies Used
+## Current Stack
 
-*   **Backend:**
-    *   Java (JDK 17)
-    *   Spring Boot (version 2.7.5)
-    *   Gradle
-*   **Frontend:**
-    *   JavaScript (ES6+)
-    *   HTML5
-    *   CSS3
-    *   Express.js (for serving static frontend files)
-*   **Simulation:**
-    *   Custom Java logic for creature movement (including toroidal world wrapping), interaction (eating, hunting, reproduction), and lifecycle (aging, energy consumption, health).
-    *   Creature types include Plants, Herbivores, and Carnivores, each with distinct behaviors.
+*   **Backend**
+    *   Java 21
+    *   Spring Boot 3.4.3
+    *   Gradle 9.x compatible build
+*   **Frontend**
+    *   JavaScript (ES6+), p5.js
+    *   HTML5, CSS3
+    *   Express.js static server
+*   **Simulation/runtime capabilities**
+    *   Deterministic RNG with seed control (`POST /api/simulation/reset?seed=...`)
+    *   Metadata endpoint (`/api/simulation/metadata`) including world bounds and population counters
+    *   Frontend world-to-canvas mapping with interpolation for smoother perceived movement
+    *   Behavior states (e.g., `Roaming`, `Seeking food`, `Evading`, `Pursuing`, `Mate-seeking`, `Growing`)
 
-## Setup and Running Instructions
+## Run the App
 
-### Prerequisites:
+### Prerequisites
 
-*   **JDK:** Version 17 or newer is recommended (project is set to sourceCompatibility '17').
-*   **Gradle:** The project includes a Gradle wrapper (`gradlew` and `gradlew.bat`), so a separate Gradle installation is not strictly required. If you prefer to use an installed version, ensure it's compatible.
-*   **Node.js and npm:** Required for the frontend. Download from [nodejs.org](https://nodejs.org/).
+*   Java 21+
+*   Node.js + npm
+*   Gradle (installed) or Gradle wrapper if preferred
 
-### Backend (Spring Boot Application):
+### Backend (Spring Boot)
 
-1.  **Navigate to the project root directory** in your terminal.
-2.  **Run the Spring Boot application:**
-    *   On Linux/macOS: `./gradlew bootRun`
-    *   On Windows: `gradlew.bat bootRun`
-3.  The backend server will start, and by default, it will be available at `http://localhost:8080`.
-    *   The simulation begins running automatically in the background.
+From this repository root (`Ecosistema/`):
 
-### Frontend (Node.js/Express Server):
+```bash
+cd ecosystem-app
+gradle bootRun --no-daemon
+```
 
-1.  **Navigate to the `frontend` directory:**
-    ```bash
-    cd frontend
-    ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-3.  **Start the frontend server:**
-    ```bash
-    npm start
-    ```
-4.  The frontend server will start, and by default, it will be accessible at `http://localhost:8081`.
-5.  **Open `http://localhost:8081` in your web browser** to view the simulation.
+Backend runs on `http://localhost:8080`.
 
-## API Endpoint
+### Frontend (Express)
 
-The application exposes an API endpoint to get the current state of the simulation.
-For detailed information about the API, see the [API Documentation](API_DOCUMENTATION.md).
+From this repository root (`Ecosistema/`):
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Frontend runs on `http://localhost:8081`.
+
+## Frontend Controls
+
+*   **Seed (optional) + Reset**: reset with deterministic seed
+*   **Random Reset**: reset with non-deterministic seed
+*   **Replay Check**: runs same-seed reset comparison
+*   **Behavior cues toggle**: press `L` to show/hide in-canvas behavior cue rings and legend state
+*   **Download Canvas**: export current frame as PNG
+
+## API
+
+See [API Documentation](API_DOCUMENTATION.md) for full request/response details.
+
+Core endpoints:
+
+*   `GET /api/simulation/state`
+*   `GET /api/simulation/metadata`
+*   `POST /api/simulation/reset`
+*   `POST /api/simulation/reset?seed=<long>`
 
 ## Project Structure Overview
 
-*   `ecosystem-app/`: Root directory for the backend Spring Boot application.
-    *   `src/main/java/com/ecosystem/`: Main Java source code for the backend.
-        *   `controller/`: Spring MVC controllers (e.g., `SimulationController.java`).
-        *   `model/`: Core data models.
-            *   `creatures/`: Creature classes (`Creature.java`, `Plant.java`, `Herbivore.java`, `Carnivore.java`).
-            *   `environment/`: Environment classes (`Territory.java`, `TPlace.java`).
-            *   `enums/`: Enumerations like `Gender.java`.
-        *   `services/`: Service layer classes (e.g., `SimulationService.java`).
-        *   `utils/`: Utility classes (e.g., `EcoUtils.java`).
-    *   `src/test/java/com/ecosystem/`: Unit tests for the backend.
-    *   `build.gradle`: Gradle build script for the backend.
-*   `frontend/`: Root directory for the frontend application.
-    *   `public/`: Static assets (HTML, CSS, JavaScript client code).
-        *   `index.html`: Main HTML page for the frontend.
-        *   `style.css`: CSS styles.
-        *   `app.js`: Client-side JavaScript for fetching data and rendering the simulation on canvas.
-    *   `package.json`: Node.js project file for managing frontend dependencies and scripts.
-    *   `server.js`: Express.js server to serve the static files in `public/`.
-*   `API_DOCUMENTATION.md`: Detailed documentation for the backend API.
-*   `README.md`: This file - project overview and setup instructions.
-*   `TestingNotes.md`: Manual frontend testing checklist.
+*   `ecosystem-app/` backend service and simulation model
+*   `frontend/` web UI (p5.js rendering and controls)
+*   `API_DOCUMENTATION.md` backend API reference
+*   `testing-notes/` implementation/testing notes archive (`TestingNotes*.md`), indexed in `testing-notes/README.md`
 
----
+## Notes
 
-This structure separates the backend Java application from the frontend JavaScript application, allowing them to be developed and run somewhat independently, communicating via the defined API.
+If visuals seem stale after updates, do a hard refresh in the browser (`Cmd+Shift+R`) to bypass cached frontend assets.
+
+## Quick QA Checklist (2–3 minutes)
+
+Use this checklist after pulling changes or updating simulation/render logic.
+
+1. **Service health**
+    * Backend responds: `GET /api/simulation/state` and `GET /api/simulation/metadata` return `200`.
+    * Frontend loads at `http://localhost:8081`.
+
+2. **Deterministic reset**
+    * Enter a seed (e.g., `2026`) and click **Reset**.
+    * Confirm header shows the same seed and step resets to `0`.
+    * Click **Replay Check** and confirm it reports `PASS`.
+
+3. **World/grid alignment**
+    * Verify creatures occupy the same apparent interaction space as the grid/habitat.
+    * Confirm there is no half-canvas seam or dead zone where grid/environment diverges from creature activity.
+
+4. **Behavior-state readability**
+    * Click different creatures and verify status badge appears (e.g., `Roaming`, `Seeking food`, `Pursuing`, `Evading`, `Growing`).
+    * Confirm in-canvas cue rings match legend meaning.
+
+5. **Behavior cue toggle**
+    * Press `L` to hide behavior cues and legend state.
+    * Press `L` again to restore cues.
+
+6. **Timeline/metadata updates**
+    * Let simulation run for ~5–10 seconds.
+    * Confirm `step` increases and trend lines update.
+
+7. **Random reset sanity**
+    * Click **Random Reset** and verify `seed` becomes `Random` in UI.
+    * Ensure simulation continues (population remains non-empty and moving).

@@ -16,12 +16,12 @@ public class CreatureTest {
     @BeforeEach
     void setUp() {
         // Basic creature for most tests
-        creature = new Creature("TestCreature", 50, 50, 1, 10, true, Gender.MALE, 0.1f, 1000, 0.05f, 2, 20);
+        creature = new Creature("TestCreature", 50, 50, 1, 10, true, Gender.MALE, 0.1f, 1000, 0.05f, 2, 20, worldWidth, worldHeight);
     }
 
     @Test
     void constructor_initializesPropertiesCorrectly() {
-        Creature c = new Creature("ConstructorTest", 10, 20, 2, 15, false, Gender.FEMALE, 0.2f, 500, 0.1f, 1, 10);
+        Creature c = new Creature("ConstructorTest", 10, 20, 2, 15, false, Gender.FEMALE, 0.2f, 500, 0.1f, 1, 10, worldWidth, worldHeight);
         assertNotNull(c.getId(), "ID should not be null"); // ID is auto-generated
         assertEquals("ConstructorTest", c.getName());
         assertEquals(10, c.getX());
@@ -87,8 +87,9 @@ public class CreatureTest {
     
     @Test
     void move_nonToroidalMovement_bounces() {
-        Creature nonToroidalCreature = new Creature("NonToroidal", 5, 5, 2, 10, false, Gender.MALE, 0.1f, 100, 0.1f, 1, 10);
+        Creature nonToroidalCreature = new Creature("NonToroidal", 5, 5, 2, 10, false, Gender.MALE, 0.1f, 100, 0.1f, 1, 10, worldWidth, worldHeight);
         nonToroidalCreature.setSpeed(10); // Large speed to ensure it hits boundary
+        nonToroidalCreature.setDirVariation(0f);
         
         // Move towards negative X
         nonToroidalCreature.setDirection((float) Math.PI); // West
@@ -137,7 +138,7 @@ public class CreatureTest {
 
     @Test
     void solveEncounter_baseVersion_reproductionIfPossible() {
-        Creature partner = new Creature("Partner", 51, 51, 1, 10, true, Gender.FEMALE, 0.1f, 1000, 0.05f, 2, 20);
+        Creature partner = new Creature("Partner", 51, 51, 1, 10, true, Gender.FEMALE, 0.1f, 1000, 0.05f, 2, 20, worldWidth, worldHeight);
         creature.setEnergy(100); // Ensure enough energy for reproduction
         partner.setEnergy(100);
         creature.setMateTimer(0);
@@ -154,7 +155,7 @@ public class CreatureTest {
     
     @Test
     void solveEncounter_baseVersion_noReproductionIfMateTimerActive() {
-        Creature partner = new Creature("Partner", 51, 51, 1, 10, true, Gender.FEMALE, 0.1f, 1000, 0.05f, 2, 20);
+        Creature partner = new Creature("Partner", 51, 51, 1, 10, true, Gender.FEMALE, 0.1f, 1000, 0.05f, 2, 20, worldWidth, worldHeight);
         creature.setEnergy(100);
         partner.setEnergy(100);
         creature.setMateTimer(10); // Mate timer active for 'creature'
@@ -174,7 +175,7 @@ public class CreatureTest {
 
     @Test
     void solveEncounter_withDeadCreature_returnsNull() {
-        Creature deadPartner = new Creature("DeadPartner", 51, 51, 1, 10, true, Gender.FEMALE, 0.1f, 1000, 0.05f, 2, 20);
+        Creature deadPartner = new Creature("DeadPartner", 51, 51, 1, 10, true, Gender.FEMALE, 0.1f, 1000, 0.05f, 2, 20, worldWidth, worldHeight);
         deadPartner.setHealth(0); // Make it dead
         List<Creature> offspring = creature.solveEncounter(deadPartner, worldWidth, worldHeight);
         assertNull(offspring, "Encounter with a dead creature should return null.");
@@ -182,7 +183,7 @@ public class CreatureTest {
     
     @Test
     void solveEncounter_differentGendersButTooFar_noReproduction() {
-        Creature partner = new Creature("FarPartner", 90, 90, 1, 10, true, Gender.FEMALE, 0.1f, 1000, 0.05f, 2, 20); // Far away
+        Creature partner = new Creature("FarPartner", 90, 90, 1, 10, true, Gender.FEMALE, 0.1f, 1000, 0.05f, 2, 20, worldWidth, worldHeight); // Far away
         creature.setEnergy(100);
         partner.setEnergy(100);
         creature.setMateTimer(0);

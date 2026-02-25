@@ -19,7 +19,7 @@ This document guides you through a holistic test of the "Phase 1" UI and layout 
 
 ## II. Test Execution:
 
-Navigate to the frontend URL (typically `http://localhost:8081`) and perform the following checks, referencing details from previous testing notes where helpful (e.g., `TestingNotes_P5Container.md`, `TestingNotes_P5Styling.md`, `TestingNotes_ModernUIStyles.md`).
+Navigate to the frontend URL (typically `http://localhost:8081`) and perform the following checks, referencing details from previous testing notes where helpful (e.g., [TestingNotes_P5Container.md](TestingNotes_P5Container.md), [TestingNotes_P5Styling.md](TestingNotes_P5Styling.md), [TestingNotes_ModernUIStyles.md](TestingNotes_ModernUIStyles.md)).
 
 ### A. Overall Page Layout and Appearance
 

@@ -19,7 +19,7 @@ This document guides you through a holistic test of the Ecosystem Simulator web 
 Navigate to the frontend URL (typically `http://localhost:8081`) and perform the following checks.
 
 ### A. Full-Screen Canvas and Fixed Background Art Verification
-*(Referencing checks from `TestingNotes_FullScreenCanvas.md` and `TestingNotes_FixedBackgroundArt.md`)*
+*(Referencing checks from [TestingNotes_FullScreenCanvas.md](TestingNotes_FullScreenCanvas.md) and [TestingNotes_FixedBackgroundArt.md](TestingNotes_FixedBackgroundArt.md))*
 
 1.  **Canvas Layout:**
     *   [ ] Does the main canvas element fill the *entire* browser window?
@@ -33,7 +33,7 @@ Navigate to the frontend URL (typically `http://localhost:8081`) and perform the
     *   [ ] Does the message `"Attempted to draw fixed background art."` appear repeatedly in the console (once per frame)?
 
 ### B. Creature Rendering Verification
-*(Referencing checks from `TestingNotes_CreaturesOnFixedArt.md` and knowledge of the 600x600 effective simulation area)*
+*(Referencing checks from [TestingNotes_CreaturesOnFixedArt.md](TestingNotes_CreaturesOnFixedArt.md) and knowledge of the 600x600 effective simulation area)*
 
 1.  **Creature Visibility and Appearance:**
     *   [ ] Are creatures visible, appearing **on top of** the fixed background art?
@@ -58,7 +58,7 @@ Navigate to the frontend URL (typically `http://localhost:8081`) and perform the
     *   [ ] Is `Creatures received in gameLoop: [...]` logged, showing a valid array?
 
 ### D. Download Canvas Feature Verification
-*(Referencing checks from `TestingNotes_DownloadCanvas.md`)*
+*(Referencing checks from [TestingNotes_DownloadCanvas.md](TestingNotes_DownloadCanvas.md))*
 
 1.  **Button Visibility:**
     *   [ ] Is the "Download Canvas" button visible (typically bottom-left)?

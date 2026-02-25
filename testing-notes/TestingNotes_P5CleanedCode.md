@@ -2,7 +2,7 @@
 
 This document guides you through testing the current P5.js rendering setup in `frontend/public/app.js` after obsolete code has been removed. The primary goal is to confirm that creatures are being fetched and rendered correctly using P5.js.
 
-**Please refer primarily to the detailed steps already outlined in `TestingNotes_P5CreatureDrawing.md`.** This document serves as a reminder of the key aspects to check with the now cleaner `app.js` file.
+**Please refer primarily to the detailed steps already outlined in [TestingNotes_P5CreatureDrawing.md](TestingNotes_P5CreatureDrawing.md).** This document serves as a reminder of the key aspects to check with the now cleaner `app.js` file.
 
 ## Prerequisites:
 
@@ -15,7 +15,7 @@ This document guides you through testing the current P5.js rendering setup in `f
     *   `drawP5Creature()` uses P5.js commands to render creatures.
 4.  The frontend Node.js server is running (`npm start` in the `frontend` directory).
 
-## Key Verification Points (from `TestingNotes_P5CreatureDrawing.md`):
+## Key Verification Points (from [TestingNotes_P5CreatureDrawing.md](TestingNotes_P5CreatureDrawing.md)):
 
 1.  **Ensure Backend and Frontend are Running.**
 2.  **Test in Browser:**
@@ -51,6 +51,6 @@ Please provide feedback focusing on:
 *   **2. Console Errors:**
     *   Are there any errors in the console? If so, please provide the error messages.
 *   **3. Initial Fixed Art (from `setup()` in previous P5 test - Subtask #20):**
-    *   The fixed diagnostic art (red square, blue circle, green line) that was temporarily drawn in `setup()` in the *very first P5 setup test* (Subtask #20's `TestingNotes_P5Setup.md`) is no longer being drawn in the current `app.js`'s `setup()` or `draw()` function (it was removed from `draw()` in Subtask #21, and was not part of `setup()` in the final version of #20's `app.js`). This is expected. The focus now is purely on creature rendering on the blank canvas.
+    *   The fixed diagnostic art (red square, blue circle, green line) that was temporarily drawn in `setup()` in the *very first P5 setup test* (Subtask #20's [TestingNotes_P5Setup.md](TestingNotes_P5Setup.md)) is no longer being drawn in the current `app.js`'s `setup()` or `draw()` function (it was removed from `draw()` in Subtask #21, and was not part of `setup()` in the final version of #20's `app.js`). This is expected. The focus now is purely on creature rendering on the blank canvas.
 
 This test will confirm if the migration to P5.js for rendering, using the cleaned-up codebase, is successful.

@@ -12,12 +12,12 @@ public class PlantTest {
 
     @BeforeEach
     void setUp() {
-        plant = new Plant(50, 50, 10, true, 500);
+        plant = new Plant(50, 50, 10, true, 500, worldWidth, worldHeight);
     }
 
     @Test
     void constructor_initializesPropertiesCorrectly() {
-        Plant p = new Plant(10, 20, 12, false, 600);
+        Plant p = new Plant(10, 20, 12, false, 600, worldWidth, worldHeight);
         assertNotNull(p.getId());
         assertEquals(0, p.getSpeed(), "Plants should have zero speed.");
         assertEquals(12, p.getSize());
@@ -48,7 +48,7 @@ public class PlantTest {
         assertEquals(initialX, plant.getX(), "Plant X position should not change.");
         assertEquals(initialY, plant.getY(), "Plant Y position should not change.");
         assertEquals(initialAge + 1, plant.getAge(), "Plant should age.");
-        assertTrue(plant.getEnergy() < initialEnergy, "Plant energy should decrease slightly.");
+        assertTrue(plant.getEnergy() >= initialEnergy, "Plant energy should stay stable or increase via photosynthesis.");
     }
 
     @Test

@@ -9,11 +9,21 @@ import java.util.Random;
 public class Carnivore extends Creature {
     private static final float ENERGY_FROM_HERBIVORE = 75; // Energy gained from eating a herbivore
     private static final float HUNT_REACH = 10.0f; // How close to hunt a herbivore
+    private static final float HUNT_SENSE = 120.0f;
     private static final float FIGHT_DAMAGE = 30; // Damage dealt in a fight
+
+    private static float inferWorldDimension(float x, float y) {
+        return Math.max(100f, Math.max(x + 1f, y + 1f));
+    }
 
     public Carnivore(String name, float x, float y, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy, float effectiveWorldWidth, float effectiveWorldHeight) {
         super(name, x, y, speed, size, toroidal, gender, dirVariation, maxAge, mutationRate, maxOffspring, offspringEnergy, effectiveWorldWidth, effectiveWorldHeight);
         // Color is set in super constructor
+    }
+
+    // Backward-compatible constructor used by older tests/callers
+    public Carnivore(String name, float x, float y, float speed, int size, boolean toroidal, Gender gender, float dirVariation, int maxAge, float mutationRate, int maxOffspring, float offspringEnergy) {
+        this(name, x, y, speed, size, toroidal, gender, dirVariation, maxAge, mutationRate, maxOffspring, offspringEnergy, inferWorldDimension(x, y), inferWorldDimension(x, y));
     }
     
     // Constructor for random world position
@@ -31,6 +41,7 @@ public class Carnivore extends Creature {
 
             if (!herbivore.isAlive()) { // If herbivore died from the attack
                 this.setEnergy(this.getEnergy() + ENERGY_FROM_HERBIVORE);
+                this.setStatus("Feeding");
                 // System.out.println(this.getName() + " ate " + herbivore.getName() + " and gained " + ENERGY_FROM_HERBIVORE + " energy.");
             } else {
                  // Herbivore might fight back or flee - for now, only Carnivore actively damages in this interaction
@@ -49,6 +60,11 @@ public class Carnivore extends Creature {
         if (other instanceof Herbivore) {
             Herbivore herbivore = (Herbivore) other;
             float distance = (float) Math.hypot(this.getX() - herbivore.getX(), this.getY() - herbivore.getY());
+            if (distance < HUNT_SENSE) {
+                float directionToPrey = (float) Math.atan2(herbivore.getY() - this.getY(), herbivore.getX() - this.getX());
+                this.setDirection(directionToPrey);
+                this.setStatus("Pursuing");
+            }
             // Carnivores hunt Herbivores if close enough and hungry (e.g. energy < 70%)
             if (distance < (this.getSize() / 2.0f + herbivore.getSize() / 2.0f + HUNT_REACH) && this.getEnergy() < 70) {
                 huntAndEat(herbivore);
@@ -67,6 +83,8 @@ public class Carnivore extends Creature {
             Carnivore otherCarnivore = (Carnivore) other;
             if (this.canMateWith(otherCarnivore)) {
                  float distance = (float) Math.hypot(this.getX() - other.getX(), this.getY() - other.getY());
+                 this.setDirection((float) Math.atan2(other.getY() - this.getY(), other.getX() - this.getX()));
+                 this.setStatus("Mate-seeking");
                  if (distance < (this.getSize() + other.getSize()) * 0.7f) { // Mating distance
                     return this.reproduce(otherCarnivore, worldWidth, worldHeight);
                 }
